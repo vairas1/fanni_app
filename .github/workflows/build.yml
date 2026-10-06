@@ -12,6 +12,14 @@ jobs:
         with:
           flutter-version: '3.24.3'
           channel: stable
+      - name: Generate Android platform (v2 embedding)
+        run: |
+          mkdir -p /tmp/keep && cp -r lib /tmp/keep/lib && cp pubspec.yaml /tmp/keep/pubspec.yaml
+          if [ -f android/app/google-services.json ]; then cp android/app/google-services.json /tmp/keep/gs.json; fi
+          rm -rf android
+          flutter create --platforms=android --project-name fanni_app --org com.example.fanni .
+          rm -rf lib && cp -r /tmp/keep/lib lib && cp /tmp/keep/pubspec.yaml pubspec.yaml
+          if [ -f /tmp/keep/gs.json ]; then cp /tmp/keep/gs.json android/app/google-services.json; fi
       - run: flutter pub get
       - run: flutter build apk --debug
       - uses: actions/upload-artifact@v4
@@ -27,6 +35,14 @@ jobs:
         with:
           flutter-version: '3.24.3'
           channel: stable
+      - name: Generate iOS platform
+        run: |
+          mkdir -p /tmp/keep && cp -r lib /tmp/keep/lib && cp pubspec.yaml /tmp/keep/pubspec.yaml
+          if [ -f ios/Runner/GoogleService-Info.plist ]; then cp ios/Runner/GoogleService-Info.plist /tmp/keep/plist; fi
+          rm -rf ios
+          flutter create --platforms=ios --project-name fanni_app --org com.example.fanni .
+          rm -rf lib && cp -r /tmp/keep/lib lib && cp /tmp/keep/pubspec.yaml pubspec.yaml
+          if [ -f /tmp/keep/plist ]; then cp /tmp/keep/plist ios/Runner/GoogleService-Info.plist; fi
       - run: flutter pub get
       - run: flutter build ios --no-codesign
       - uses: actions/upload-artifact@v4
