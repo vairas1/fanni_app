@@ -1,0 +1,23 @@
+// انسخ القيم المهمة من هنا إلى android/app/build.gradle بعد flutter create
+// المهم: applicationId + minSdk + google-services plugin
+
+// أعلى الملف أضف:
+// plugins { id "com.android.application"; id "kotlin-android"; id "dev.flutter.flutter-gradle-plugin"; id "com.google.gms.google-services" }
+
+android {
+    namespace = "com.example.fanni.fanni_app"
+    compileSdk = 34
+
+    defaultConfig {
+        applicationId = "com.example.fanni.fanni_app"
+        minSdk = 23
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0.0"
+        multiDexEnabled = true
+    }
+}
+
+dependencies {
+    implementation("androidx.multidex:multidex:2.0.1")
+}

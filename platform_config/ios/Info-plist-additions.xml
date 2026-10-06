@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- أضف هذه المفاتيح داخل <dict> في ios/Runner/Info.plist بعد flutter create -->
+<plist version="1.0">
+<dict>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>نحتاج موقعك لتحديد عنوان تقديم الخدمة على الخريطة</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>نحتاج موقعك لتحديد عنوان تقديم الخدمة على الخريطة</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>نحتاج الوصول للصور لإرفاق صور في الدردشة مع الفني</string>
+    <key>NSCameraUsageDescription</key>
+    <string>نحتاج الكاميرا لالتقاط صور مكان الخدمة</string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>remote-notification</string>
+    </array>
+</dict>
+</plist>

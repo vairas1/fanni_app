@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>معاينة واجهة الفني</title>
+<style>
+*{box-sizing:border-box;font-family:'Segoe UI',Tahoma,Arial,sans-serif}
+body{background:#e8eaf6;margin:0;padding:20px;display:flex;flex-direction:column;align-items:center}
+h1{color:#1b5e20;margin:6px 0} p.sub{color:#555;margin:0 0 16px}
+.phones{display:flex;gap:20px;flex-wrap:wrap;justify-content:center}
+.phone{width:300px;height:640px;background:#fff;border-radius:36px;border:10px solid #111;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.screen-h{padding:12px;background:#1b5e20;color:#fff;font-weight:bold;text-align:center}
+.body{flex:1;overflow:auto;padding:12px}
+.card{border:1px solid #e0e0e0;border-radius:14px;padding:12px;margin-bottom:10px;background:#fff}
+.btn{background:#1b5e20;color:#fff;border:none;border-radius:10px;padding:8px 14px;cursor:pointer}
+.btn.out{background:#fff;color:#1b5e20;border:1px solid #1b5e20}
+.btn.orange{background:#ef6c00}.btn.blue{background:#0D47A1}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.chip{display:inline-block;padding:3px 10px;border-radius:20px;color:#fff;font-size:12px}
+.pend{background:#757575}.acc{background:#2e7d32}.prog{background:#ef6c00}.done{background:#1565c0}
+.bubble{max-width:75%;padding:8px 12px;border-radius:12px;margin:6px 0;font-size:14px}
+.me{background:#c8e6c9;align-self:flex-start}.other{background:#eee;align-self:flex-end}
+.chat{display:flex;flex-direction:column}
+.nav{display:flex;border-top:1px solid #eee;background:#fff}
+.nav div{flex:1;text-align:center;padding:10px 0;font-size:12px;color:#1b5e20;font-weight:bold}
+.tabs{display:flex;gap:8px;margin-bottom:10px}
+.tabs button{flex:1;padding:8px;border-radius:20px;border:1px solid #1b5e20;background:#fff;color:#1b5e20;cursor:pointer}
+.tabs button.active{background:#1b5e20;color:#fff}
+.notif{background:#e8f5e9;border:1px solid #a5d6a7;border-radius:10px;padding:10px;font-size:13px;margin-bottom:10px}
+.timeline{border-right:3px solid #1b5e20;padding-right:12px;margin:10px 0}
+.timeline div{margin:6px 0;font-size:13px}
+</style>
+</head>
+<body>
+<h1>🛠️ معاينة واجهة الفني</h1>
+<p class="sub">استلام الطلبات • الجدول الزمني • تحديث الحالة • الدردشة</p>
+<div class="tabs" style="width:640px;max-width:95vw">
+<button class="active" onclick="show(0)">1- الطلبات الجديدة</button>
+<button onclick="show(1)">2- جدولي</button>
+<button onclick="show(2)">3- تفاصيل + دردشة</button>
+</div>
+<div class="phones">
+<div class="phone" id="s0">
+<div class="screen-h">📥 طلبات الحجز 🔔</div>
+<div class="body">
+<div class="notif">📲 <b>إشعار FCM:</b> حجز جديد! تركيب كاميرات - مدينة نصر - غداً 10 صباحاً</div>
+<div class="card"><b>📹 كاميرات - محمد (عميل)</b><br><small>2026/10/07 10:00 • مدينة نصر شارع 15</small><br><small>ملاحظات: شقة دور ثالث</small><br><span class="chip pend">بانتظار القبول</span>
+<div class="row" style="margin-top:8px"><button class="btn" onclick="show(1)">قبول ✅</button><button class="btn out">رفض</button></div></div>
+<div class="card"><b>📡 دش - سارة</b><br><small>2026/10/07 12:00 • المعادي</small><br><span class="chip pend">بانتظار القبول</span>
+<div class="row" style="margin-top:8px"><button class="btn" onclick="show(1)">قبول ✅</button><button class="btn out">رفض</button></div></div>
+</div>
+<div class="nav"><div>📥 الطلبات</div><div>📅 جدولي</div><div>👤 حسابي</div></div>
+</div>
+<div class="phone" id="s1" style="display:none">
+<div class="screen-h">📅 جدولي الزمني</div>
+<div class="body">
+<div class="timeline">
+<div>✅ 10:00 - كاميرات / محمد <span class="chip acc">مقبول</span> <button class="btn orange" style="padding:4px 10px">بدء ▶</button></div>
+<div>🔄 12:00 - دش / سارة <span class="chip prog">جارٍ التنفيذ</span> <button class="btn blue" style="padding:4px 10px">إنهاء ✔</button></div>
+<div>✔ 14:00 - إنتركم / خالد <span class="chip done">مكتمل ⭐5</span></div>
+</div>
+<div class="card"><b>إعدادات التوفر</b><br>🟢 متاح لاستقبال طلبات <br>خدماتي: 📹 📡 🔔<br>☎ 01001234567</div>
+</div>
+<div class="nav"><div>📥 الطلبات</div><div>📅 جدولي</div><div>👤 حسابي</div></div>
+</div>
+<div class="phone" id="s2" style="display:none">
+<div class="screen-h">تفاصيل الحجز + 💬</div>
+<div class="body chat">
+<div class="card" style="font-size:13px">📹 <b>كاميرات</b> • محمد<br>📍 مدينة نصر • 🕙 غداً 10:00<br>الحالة: <span class="chip prog">جارٍ التنفيذ</span></div>
+<div class="bubble other">أهلاً، أنا العميل محمد، العنوان شارع 15</div>
+<div class="bubble me">تمام، سأصل 10 صباحاً 👍</div>
+<div class="bubble other">📷 [صورة: مكان التركيب.jpg]</div>
+<div class="bubble me">ممتاز، سأحضر المعدات</div>
+<div class="row"><button class="btn orange">بدء التنفيذ ▶</button><button class="btn blue">إنهاء ✔</button></div>
+</div>
+<div style="display:flex;gap:6px;padding:8px;border-top:1px solid #eee"><button class="btn">📷</button><input style="flex:1;border:1px solid #ccc;border-radius:10px;padding:8px" placeholder="اكتب..." /><button class="btn">➤</button></div>
+</div>
+</div>
+<script>
+function show(i){for(let k=0;k<3;k++)document.getElementById('s'+k).style.display=k===i?'flex':'none';document.querySelectorAll('.tabs button').forEach((b,j)=>b.classList.toggle('active',j===i));}
+</script>
+</body>
+</html>

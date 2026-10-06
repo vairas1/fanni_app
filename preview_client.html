@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>معاينة واجهة العميل - تطبيق فنيّات</title>
+<style>
+*{box-sizing:border-box;font-family:'Segoe UI',Tahoma,Arial,sans-serif}
+body{background:#eef2f7;margin:0;padding:20px;display:flex;flex-direction:column;align-items:center}
+h1{color:#0D47A1;margin:6px 0} p.sub{color:#555;margin:0 0 16px}
+.phones{display:flex;gap:20px;flex-wrap:wrap;justify-content:center}
+.phone{width:300px;height:640px;background:#fff;border-radius:36px;border:10px solid #111;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.screen-h{padding:12px;background:#0D47A1;color:#fff;font-weight:bold;text-align:center}
+.body{flex:1;overflow:auto;padding:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{border:1px solid #e0e0e0;border-radius:14px;padding:14px 8px;text-align:center;background:#fafafa;cursor:pointer}
+.card .e{font-size:38px} .card b{font-size:13px;display:block;margin-top:6px} .card small{color:#888}
+.tech{display:flex;gap:10px;align-items:center;border:1px solid #eee;border-radius:12px;padding:10px;margin-bottom:10px;background:#fff}
+.avatar{width:44px;height:44px;border-radius:50%;background:#0D47A1;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold}
+.btn{background:#0D47A1;color:#fff;border:none;border-radius:10px;padding:8px 14px;cursor:pointer}
+.btn.green{background:#2e7d32}.btn.orange{background:#ef6c00}
+.map{height:170px;background:linear-gradient(135deg,#c8e6c9,#a5d6a7);border-radius:12px;position:relative;display:flex;align-items:center;justify-content:center;margin:8px 0}
+.pin{font-size:44px}
+.inp{width:100%;border:1px solid #ccc;border-radius:10px;padding:10px;margin:6px 0}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.bubble{max-width:75%;padding:8px 12px;border-radius:12px;margin:6px 0;font-size:14px}
+.me{background:#dbeafe;align-self:flex-start}.other{background:#eee;align-self:flex-end}
+.chat{display:flex;flex-direction:column}
+.nav{display:flex;border-top:1px solid #eee;background:#fff}
+.nav div{flex:1;text-align:center;padding:10px 0;font-size:12px;color:#0D47A1;font-weight:bold}
+.stars{color:#f5a623}
+.tabs{display:flex;gap:8px;margin-bottom:10px}
+.tabs button{flex:1;padding:8px;border-radius:20px;border:1px solid #0D47A1;background:#fff;color:#0D47A1;cursor:pointer}
+.tabs button.active{background:#0D47A1;color:#fff}
+.note{background:#fff3cd;border:1px solid #ffe08a;border-radius:10px;padding:10px;font-size:13px;margin-top:12px}
+</style>
+</head>
+<body>
+<h1>📱 معاينة واجهة العميل</h1>
+<p class="sub">تطبيق فنيّات — كاميرات • دش • إنتركم | اضغط على الخدمة للتنقل بين الشاشات</p>
+<div class="tabs" style="width:640px;max-width:95vw">
+<button class="active" onclick="show(0)">1- الخدمات</button>
+<button onclick="show(1)">2- الفنيون</button>
+<button onclick="show(2)">3- الحجز والخريطة</button>
+<button onclick="show(3)">4- الدردشة والتقييم</button>
+</div>
+<div class="phones">
+<!-- 1 -->
+<div class="phone" id="s0">
+<div class="screen-h">الخدمات التقنية 🔧</div>
+<div class="body">
+<div class="grid">
+<div class="card" onclick="show(1)"><div class="e">📹</div><b>تركيب كاميرات</b><small>ابتداءً من 150 ج.م</small></div>
+<div class="card" onclick="show(1)"><div class="e">📡</div><b>تركيب الدش</b><small>ابتداءً من 100 ج.م</small></div>
+<div class="card" onclick="show(1)"><div class="e">🔔</div><b>تركيب الإنتركم</b><small>ابتداءً من 200 ج.م</small></div>
+<div class="card" onclick="show(1)"><div class="e">🌐</div><b>شبكات وإنترنت</b><small>ابتداءً من 120 ج.م</small></div>
+<div class="card" onclick="show(1)"><div class="e">💡</div><b>كهرباء عامة</b><small>ابتداءً من 80 ج.م</small></div>
+<div class="card" onclick="show(1)"><div class="e">❄️</div><b>تكييف وتبريد</b><small>ابتداءً من 130 ج.م</small></div>
+</div>
+<div class="note">👆 اضغط على أي خدمة لعرض الفنيين المتاحين لها</div>
+</div>
+<div class="nav"><div>🏠 الخدمات</div><div>🧾 حجوزاتي</div><div>👤 حسابي</div></div>
+</div>
+<!-- 2 -->
+<div class="phone" id="s1" style="display:none">
+<div class="screen-h">← تركيب كاميرات مراقبة</div>
+<div class="body">
+<div class="tech"><div class="avatar">أ</div><div><b>أحمد الفني ⭐ 4.8 (120)</b><br><small>📞 01001234567 • متاح</small></div><div style="margin-right:auto"><button class="btn" onclick="show(2)">احجز</button></div></div>
+<div class="tech"><div class="avatar">م</div><div><b>محمود ⭐ 4.5 (85)</b><br><small>📞 01111234567 • متاح</small></div><div style="margin-right:auto"><button class="btn" onclick="show(2)">احجز</button></div></div>
+<div class="tech"><div class="avatar">ك</div><div><b>كريم ⭐ 4.9 (200)</b><br><small>📞 01221234567 • مشغول</small></div><div style="margin-right:auto"><button class="btn" disabled>احجز</button></div></div>
+<div class="note">يتم فلترة الفنيين حسب الخدمة المختارة + التقييمات الحقيقية من Firestore</div>
+</div>
+<div class="nav"><div>🏠 الخدمات</div><div>🧾 حجوزاتي</div><div>👤 حسابي</div></div>
+</div>
+<!-- 3 -->
+<div class="phone" id="s2" style="display:none">
+<div class="screen-h">حجز: تركيب كاميرات 📹</div>
+<div class="body">
+<b>👷 أحمد الفني • 01001234567</b>
+<div class="map"><div style="text-align:center"><div class="pin">📍</div><small>اسحب الدبوس أو اضغط على الخريطة<br>(Google Maps)</small></div></div>
+<button class="btn" style="width:100%;background:#fff;color:#0D47A1;border:1px solid #0D47A1">📍 استخدام موقعي الحالي</button>
+<input class="inp" value="شارع 15، مدينة نصر، القاهرة" />
+<div class="row"><input class="inp" value="2026/10/07 📅" /><input class="inp" value="10:00 ص 🕙" /></div>
+<input class="inp" placeholder="ملاحظات للفني (اختياري)" />
+<button class="btn green" style="width:100%;padding:12px;font-size:16px" onclick="show(3)">تأكيد الحجز ✅</button>
+<div class="note">عند التأكيد يُحفظ الحجز في Firestore ويصل <b>إشعار فوري FCM</b> للفني 📲</div>
+</div>
+<div class="nav"><div>🏠 الخدمات</div><div>🧾 حجوزاتي</div><div>👤 حسابي</div></div>
+</div>
+<!-- 4 -->
+<div class="phone" id="s3" style="display:none">
+<div class="screen-h">الدردشة + التقييم 💬⭐</div>
+<div class="body chat">
+<div class="bubble other">أهلاً، أنا الفني أحمد، سأصل غداً 10 صباحاً 👍</div>
+<div class="bubble me">تمام، العنوان شارع 15 مدينة نصر</div>
+<div class="bubble other">ممكن صورة لمكان التركيب؟</div>
+<div class="bubble me">📷 [صورة مرفقة: مكان التركيب.jpg]</div>
+<div class="bubble other">تمام، سأحضر كاميرتين + DVR</div>
+<hr style="width:100%">
+<div style="border:1px solid #f5a623;border-radius:12px;padding:10px;text-align:center;background:#fffbe6">
+<b>قيّم الخدمة ⭐⭐⭐⭐⭐</b><br><small>ممتاز! تركيب نظيف وسريع</small><br><button class="btn orange" style="margin-top:6px">إرسال التقييم</button>
+</div>
+</div>
+<div style="display:flex;gap:6px;padding:8px;border-top:1px solid #eee"><button class="btn">📷</button><input class="inp" style="margin:0" placeholder="اكتب رسالة..." /><button class="btn">➤</button></div>
+</div>
+</div>
+</div>
+<script>
+function show(i){for(let k=0;k<4;k++)document.getElementById('s'+k).style.display=k===i?'flex':'none';document.querySelectorAll('.tabs button').forEach((b,j)=>b.classList.toggle('active',j===i));}
+</script>
+</body>
+</html>

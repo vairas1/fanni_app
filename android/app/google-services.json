@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "496402154712",
+    "project_id": "fanni-app-8abb0",
+    "storage_bucket": "fanni-app-8abb0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:496402154712:android:e7f4df31096148e7c603ad",
+        "android_client_info": {
+          "package_name": "com.example.fanni.fanni_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBH_q1UCanYx21xmko75dyIhX7mKgHCmWw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

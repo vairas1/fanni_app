@@ -1,0 +1,44 @@
+[
+  {
+    "_docId": "TECH_UID_1",
+    "_collection": "technicians",
+    "name": "أحمد الفني",
+    "phone": "01001234567",
+    "avatarUrl": "",
+    "services": ["cameras", "dish", "intercom"],
+    "ratingAvg": 4.8,
+    "ratingCount": 120,
+    "lat": 30.0444,
+    "lng": 31.2357,
+    "available": true,
+    "role": "technician"
+  },
+  {
+    "_docId": "TECH_UID_2",
+    "_collection": "technicians",
+    "name": "محمود الفني",
+    "phone": "01111234567",
+    "avatarUrl": "",
+    "services": ["dish", "network"],
+    "ratingAvg": 4.5,
+    "ratingCount": 85,
+    "lat": 30.05,
+    "lng": 31.24,
+    "available": true,
+    "role": "technician"
+  },
+  {
+    "_docId": "TECH_UID_3",
+    "_collection": "technicians",
+    "name": "كريم الفني",
+    "phone": "01221234567",
+    "avatarUrl": "",
+    "services": ["intercom", "electric", "ac"],
+    "ratingAvg": 4.9,
+    "ratingCount": 200,
+    "lat": 30.03,
+    "lng": 31.22,
+    "available": true,
+    "role": "technician"
+  }
+]
