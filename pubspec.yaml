@@ -23,6 +23,10 @@ dependencies:
   flutter_local_notifications: ^18.0.1
   uuid: ^4.5.1
 
+dependency_overrides:
+  # إصلاح توافق geolocator_android مع AGP 8 (خطأ Could not get unknown property 'flutter')
+  geolocator_android: ^5.0.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
