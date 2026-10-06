@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -27,27 +26,6 @@ class _BookingScreenState extends State<BookingScreen> {
   TimeOfDay _time = const TimeOfDay(hour: 10, minute: 0);
   final _addressCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
-  bool _locating = false;
-
-  Future<void> _useMyLocation() async {
-    setState(() => _locating = true);
-    try {
-      var perm = await Geolocator.checkPermission();
-      if (perm == LocationPermission.denied) {
-        perm = await Geolocator.requestPermission();
-      }
-      final p = await Geolocator.getCurrentPosition();
-      setState(() => _pos = LatLng(p.latitude, p.longitude));
-      _mapCtrl?.animateCamera(CameraUpdate.newLatLng(_pos));
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('تعذر تحديد الموقع: $e')));
-      }
-    } finally {
-      if (mounted) setState(() => _locating = false);
-    }
-  }
 
   Future<void> _pickDate() async {
     final d = await showDatePicker(
@@ -135,13 +113,9 @@ class _BookingScreenState extends State<BookingScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          OutlinedButton.icon(
-            onPressed: _locating ? null : _useMyLocation,
-            icon: _locating
-                ? const SizedBox(
-                    width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                : const Icon(Icons.my_location),
-            label: const Text('استخدام موقعي الحالي'),
+          const Text(
+            'حرّك الخريطة أو اسحب الدبوس لتحديد موقعك بدقة',
+            style: TextStyle(color: Colors.grey, fontSize: 12),
           ),
           const SizedBox(height: 8),
           TextField(
