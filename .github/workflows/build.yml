@@ -21,7 +21,7 @@ jobs:
           rm -rf lib && cp -r /tmp/keep/lib lib && cp /tmp/keep/pubspec.yaml pubspec.yaml
           if [ -f /tmp/keep/gs.json ]; then cp /tmp/keep/gs.json android/app/google-services.json; fi
           # firebase-auth يتطلب minSdk >= 23
-          sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 23/' android/app/build.gradle
+          sed -i 's/minSdk.*/minSdkVersion 23/' android/app/build.gradle
           grep -q "minSdkVersion 23" android/app/build.gradle
       - run: flutter pub get
       - run: flutter build apk --debug
@@ -47,7 +47,7 @@ jobs:
           rm -rf lib && cp -r /tmp/keep/lib lib && cp /tmp/keep/pubspec.yaml pubspec.yaml
           if [ -f /tmp/keep/plist ]; then cp /tmp/keep/plist ios/Runner/GoogleService-Info.plist; fi
           # cloud_firestore يتطلب iOS 15+
-          sed -i "s/# platform :ios.*/platform :ios, '15.0'/" ios/Podfile
+          sed -i -E "s/#? *platform :ios.*$/platform :ios, '15.0'/" ios/Podfile
           grep -q "platform :ios, '15.0'" ios/Podfile
           sed -i 's/IPHONEOS_DEPLOYMENT_TARGET = 12.0/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' ios/Runner.xcodeproj/project.pbxproj || true
       - run: flutter pub get
