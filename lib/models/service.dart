@@ -7,6 +7,7 @@ class ServiceModel {
   final IconData icon;
   final double priceFrom;
   final String imageEmoji;
+  final Color color;
 
   const ServiceModel({
     required this.id,
@@ -15,10 +16,11 @@ class ServiceModel {
     required this.icon,
     required this.priceFrom,
     required this.imageEmoji,
+    required this.color,
   });
 }
 
-/// قائمة الخدمات التقنية الثابتة (تركيب كاميرات / دش / إنتركم ...)
+/// قائمة الخدمات التقنية — كل خدمة بلونها الخاص
 const appServices = <ServiceModel>[
   ServiceModel(
     id: 'cameras',
@@ -27,6 +29,7 @@ const appServices = <ServiceModel>[
     icon: Icons.videocam,
     priceFrom: 150,
     imageEmoji: '📹',
+    color: Color(0xFF1565C0),
   ),
   ServiceModel(
     id: 'dish',
@@ -35,6 +38,7 @@ const appServices = <ServiceModel>[
     icon: Icons.satellite_alt,
     priceFrom: 100,
     imageEmoji: '📡',
+    color: Color(0xFF6A1B9A),
   ),
   ServiceModel(
     id: 'intercom',
@@ -43,6 +47,7 @@ const appServices = <ServiceModel>[
     icon: Icons.phone_in_talk,
     priceFrom: 200,
     imageEmoji: '🔔',
+    color: Color(0xFFEF6C00),
   ),
   ServiceModel(
     id: 'network',
@@ -51,6 +56,7 @@ const appServices = <ServiceModel>[
     icon: Icons.wifi,
     priceFrom: 120,
     imageEmoji: '🌐',
+    color: Color(0xFF00897B),
   ),
   ServiceModel(
     id: 'electric',
@@ -59,6 +65,7 @@ const appServices = <ServiceModel>[
     icon: Icons.electrical_services,
     priceFrom: 80,
     imageEmoji: '💡',
+    color: Color(0xFFF9A825),
   ),
   ServiceModel(
     id: 'ac',
@@ -67,5 +74,14 @@ const appServices = <ServiceModel>[
     icon: Icons.ac_unit,
     priceFrom: 130,
     imageEmoji: '❄️',
+    color: Color(0xFF00ACC1),
   ),
 ];
+
+/// لون الخدمة حسب الـ id (يُستخدم في الحجوزات والدردشة)
+Color serviceColor(String serviceId) {
+  for (final s in appServices) {
+    if (s.id == serviceId) return s.color;
+  }
+  return const Color(0xFF0D47A1);
+}

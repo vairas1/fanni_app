@@ -3,14 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/chat_message.dart';
+import '../../models/service.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/chat_provider.dart';
 import '../../services/firestore_service.dart';
 
-/// الدردشة المباشرة بين العميل والفني مع إرفاق صور
+/// الدردشة المباشرة بين العميل والفني مع إرفاق صور 📷
 class ChatScreen extends StatefulWidget {
   final String bookingId;
-  const ChatScreen({super.key, required this.bookingId});
+  final String serviceId;
+  const ChatScreen(
+      {super.key, required this.bookingId, this.serviceId = ''});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -21,25 +24,34 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final uid = context.watch<AuthProvider>().user!.uid;
+    final uid = context.watch<AuthProvider>().user?.uid ?? '';
     final chat = context.watch<ChatProvider>();
+    final sc = serviceColor(widget.serviceId);
     return Scaffold(
-      appBar: AppBar(title: const Text('الدردشة')),
+      appBar: AppBar(
+          title: const Text('💬 الدردشة المباشرة'), backgroundColor: sc),
       body: Column(
         children: [
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: FirestoreService.messagesStream(widget.bookingId),
+              stream:
+                  FirestoreService.messagesStream(widget.bookingId),
               builder: (c, snap) {
+                if (snap.hasError) {
+                  return Center(child: Text('خطأ: ${snap.error}'));
+                }
                 if (!snap.hasData) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                      child: CircularProgressIndicator());
                 }
                 final msgs = snap.data!.docs
                     .map((d) => ChatMessage.fromDoc(d))
                     .toList();
                 if (msgs.isEmpty) {
                   return const Center(
-                      child: Text('ابدأ المحادثة مع الطرف الآخر 👋'));
+                      child: Text(
+                          'ابدأ المحادثة مع الطرف الآخر 👋\nيمكنك إرفاق صور من زر 📷',
+                          textAlign: TextAlign.center));
                 }
                 return ListView.builder(
                   reverse: true,
@@ -49,36 +61,49 @@ class _ChatScreenState extends State<ChatScreen> {
                     final m = msgs[i];
                     final mine = m.senderId == uid;
                     return Align(
-                      alignment:
-                          mine ? Alignment.centerLeft : Alignment.centerRight,
+                      alignment: mine
+                          ? Alignment.centerLeft
+                          : Alignment.centerRight,
                       child: Container(
-                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        margin:
+                            const EdgeInsets.symmetric(vertical: 4),
                         padding: const EdgeInsets.all(10),
                         constraints: BoxConstraints(
-                            maxWidth:
-                                MediaQuery.of(context).size.width * 0.75),
+                            maxWidth: MediaQuery.of(context)
+                                    .size
+                                    .width *
+                                0.75),
                         decoration: BoxDecoration(
-                          color: mine ? Colors.blue[100] : Colors.grey[200],
-                          borderRadius: BorderRadius.circular(12),
+                          color: mine ? sc : Colors.grey[200],
+                          borderRadius: BorderRadius.circular(14),
                         ),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
                           children: [
                             if (m.imageUrl != null)
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
                                 child: Image.network(m.imageUrl!,
-                                    height: 160,
+                                    height: 170,
                                     fit: BoxFit.cover,
-                                    loadingBuilder: (c, w, p) => p == null
-                                        ? w
-                                        : const SizedBox(
-                                            height: 160,
-                                            child: Center(
-                                                child:
-                                                    CircularProgressIndicator()))),
+                                    loadingBuilder: (c, w, p) =>
+                                        p == null
+                                            ? w
+                                            : const SizedBox(
+                                                height: 170,
+                                                child: Center(
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                            color: Colors
+                                                                .white)))),
                               ),
-                            if (m.text.isNotEmpty) Text(m.text),
+                            if (m.text.isNotEmpty)
+                              Text(m.text,
+                                  style: TextStyle(
+                                      color: mine
+                                          ? Colors.white
+                                          : Colors.black87)),
                           ],
                         ),
                       ),
@@ -90,19 +115,40 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           if (chat.sending) const LinearProgressIndicator(),
           SafeArea(
-            child: Padding(
+            child: Container(
               padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.grey.withOpacity(0.3),
+                      blurRadius: 6,
+                      offset: const Offset(0, -2))
+                ],
+              ),
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.image),
-                    tooltip: 'إرفاق صورة',
+                    icon: Icon(Icons.image, color: sc),
+                    tooltip: 'إرفاق صورة 📷',
                     onPressed: chat.sending
                         ? null
-                        : () => context.read<ChatProvider>().sendImage(
-                              bookingId: widget.bookingId,
-                              senderId: uid,
-                            ),
+                        : () async {
+                            try {
+                              await context
+                                  .read<ChatProvider>()
+                                  .sendImage(
+                                    bookingId: widget.bookingId,
+                                    senderId: uid,
+                                  );
+                            } catch (e) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                        content: Text('تعذر رفع الصورة: $e')));
+                              }
+                            }
+                          },
                   ),
                   Expanded(
                     child: TextField(
@@ -113,19 +159,17 @@ class _ChatScreenState extends State<ChatScreen> {
                         contentPadding: EdgeInsets.symmetric(
                             horizontal: 12, vertical: 8),
                       ),
+                      onSubmitted: (_) => _send(uid),
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: () {
-                      context.read<ChatProvider>().sendText(
-                            bookingId: widget.bookingId,
-                            senderId: uid,
-                            text: _ctrl.text,
-                          );
-                      _ctrl.clear();
-                    },
+                  const SizedBox(width: 6),
+                  CircleAvatar(
+                    backgroundColor: sc,
+                    child: IconButton(
+                      icon: const Icon(Icons.send,
+                          color: Colors.white, size: 20),
+                      onPressed: () => _send(uid),
+                    ),
                   ),
                 ],
               ),
@@ -134,5 +178,15 @@ class _ChatScreenState extends State<ChatScreen> {
         ],
       ),
     );
+  }
+
+  void _send(String uid) {
+    if (_ctrl.text.trim().isEmpty || uid.isEmpty) return;
+    context.read<ChatProvider>().sendText(
+          bookingId: widget.bookingId,
+          senderId: uid,
+          text: _ctrl.text,
+        );
+    _ctrl.clear();
   }
 }

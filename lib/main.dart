@@ -7,7 +7,7 @@ import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/booking_provider.dart';
 import 'providers/chat_provider.dart';
-import 'screens/common/role_select_screen.dart';
+import 'screens/common/auth_screen.dart';
 import 'screens/common/splash_screen.dart';
 import 'screens/client/client_shell.dart';
 import 'screens/tech/tech_shell.dart';
@@ -18,7 +18,6 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  // تهيئة الإشعارات (المعالج الخلفي يجب أن يكون top-level)
   await NotificationService.init();
   runApp(const FanniApp());
 }
@@ -28,6 +27,7 @@ class FanniApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const deepBlue = Color(0xFF0D47A1);
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
@@ -46,13 +46,38 @@ class FanniApp extends StatelessWidget {
         ],
         theme: ThemeData(
           useMaterial3: true,
-          fontFamily: null,
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0D47A1)),
-          appBarTheme: const AppBarTheme(centerTitle: true),
+          colorScheme: ColorScheme.fromSeed(seedColor: deepBlue),
+          appBarTheme: const AppBarTheme(
+            centerTitle: true,
+            backgroundColor: deepBlue,
+            foregroundColor: Colors.white,
+          ),
+          cardTheme: CardTheme(
+            elevation: 3,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          ),
+          inputDecorationTheme: InputDecorationTheme(
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: deepBlue,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+          navigationBarTheme: const NavigationBarThemeData(
+            backgroundColor: Colors.white,
+            indicatorColor: Color(0xFFBBDEFB),
+          ),
         ),
         home: const SplashScreen(),
         routes: {
-          '/role': (_) => const RoleSelectScreen(),
+          '/auth': (_) => const AuthScreen(),
           '/client': (_) => const ClientShell(),
           '/tech': (_) => const TechShell(),
         },

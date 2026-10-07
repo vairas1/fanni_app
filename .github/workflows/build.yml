@@ -24,6 +24,10 @@ jobs:
           sed -i 's/minSdk.*/minSdkVersion 23/' android/app/build.gradle
           grep -q "minSdkVersion 23" android/app/build.gradle
       - run: flutter pub get
+      - name: App icon + name
+        run: |
+          dart run flutter_launcher_icons
+          sed -i 's/android:label="[^"]*"/android:label="فنيّات"/' android/app/src/main/AndroidManifest.xml
       - run: flutter build apk --debug
       - uses: actions/upload-artifact@v4
         with:
@@ -51,6 +55,8 @@ jobs:
           grep -q "platform :ios, '15.0'" ios/Podfile
           sed -i 's/IPHONEOS_DEPLOYMENT_TARGET = 12.0/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' ios/Runner.xcodeproj/project.pbxproj || true
       - run: flutter pub get
+      - name: App icon
+        run: dart run flutter_launcher_icons
       - run: flutter build ios --no-codesign
       - uses: actions/upload-artifact@v4
         with:

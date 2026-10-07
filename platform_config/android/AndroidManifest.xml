@@ -1,8 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- انسخ هذا الملف إلى: android/app/src/main/AndroidManifest.xml بعد تنفيذ flutter create -->
+    <!-- الخريطة OpenStreetMap لا تحتاج مفتاح API ولا صلاحية موقع -->
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
@@ -23,9 +22,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-        <!-- مفتاح خرائط جوجل: ضع مفتاحك مكان YOUR_MAPS_KEY -->
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="YOUR_MAPS_KEY"/>
 
         <!-- قناة الإشعارات الافتراضية لـ FCM -->
         <meta-data android:name="com.google.firebase.messaging.default_notification_channel_id" android:value="bookings_channel"/>

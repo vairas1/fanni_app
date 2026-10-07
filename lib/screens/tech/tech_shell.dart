@@ -27,9 +27,12 @@ class _TechShellState extends State<TechShell> {
         selectedIndex: _i,
         onDestinationSelected: (v) => setState(() => _i = v),
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.inbox), label: 'الطلبات'),
-          NavigationDestination(icon: Icon(Icons.calendar_month), label: 'جدولي'),
-          NavigationDestination(icon: Icon(Icons.person), label: 'حسابي'),
+          NavigationDestination(
+              icon: Icon(Icons.inbox), label: 'الطلبات'),
+          NavigationDestination(
+              icon: Icon(Icons.calendar_month), label: 'جدولي'),
+          NavigationDestination(
+              icon: Icon(Icons.person), label: 'حسابي'),
         ],
       ),
     );

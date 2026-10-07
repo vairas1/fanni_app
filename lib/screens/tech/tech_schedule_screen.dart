@@ -4,10 +4,12 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/booking.dart';
+import '../../models/service.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/booking_provider.dart';
 import '../../services/firestore_service.dart';
 import '../common/booking_details_screen.dart';
+import 'tech_requests_screen.dart' show techGreen;
 
 /// الجدول الزمني للفني + تحديث حالة الخدمة
 class TechScheduleScreen extends StatelessWidget {
@@ -15,9 +17,11 @@ class TechScheduleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uid = context.watch<AuthProvider>().user!.uid;
+    final uid = context.watch<AuthProvider>().user?.uid ?? '';
     return Scaffold(
-      appBar: AppBar(title: const Text('جدولي الزمني')),
+      appBar: AppBar(
+          title: const Text('📅 جدولي الزمني'),
+          backgroundColor: techGreen),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirestoreService.techBookings(uid),
         builder: (c, snap) {
@@ -33,23 +37,33 @@ class TechScheduleScreen extends StatelessWidget {
               .toList()
             ..sort((a, b) => a.dateTime.compareTo(b.dateTime));
           if (all.isEmpty) {
-            return const Center(child: Text('لا توجد مهام مجدولة'));
+            return const Center(
+                child: Text('لا توجد مهام مجدولة'));
           }
           return ListView.builder(
+            padding: const EdgeInsets.all(12),
             itemCount: all.length,
             itemBuilder: (c, i) {
               final b = all[i];
+              final sc = serviceColor(b.serviceId);
               return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 child: ListTile(
-                  title: Text('${b.serviceName} - ${b.clientName}'),
+                  leading: CircleAvatar(
+                    backgroundColor: sc,
+                    child: const Icon(Icons.build,
+                        color: Colors.white),
+                  ),
+                  title: Text('${b.serviceName} - ${b.clientName}',
+                      style:
+                          const TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: Text(
-                      '${DateFormat('yyyy/MM/dd HH:mm').format(b.dateTime)}\n${BookingStatus.label(b.status)}'),
+                      '${DateFormat('yyyy/MM/dd HH:mm').format(b.dateTime)}\n${BookingStatus.label(b.status)}${b.rating != null ? ' ⭐${b.rating}' : ''}'),
                   isThreeLine: true,
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => BookingDetailsScreen(bookingId: b.id)),
+                        builder: (_) =>
+                            BookingDetailsScreen(bookingId: b.id)),
                   ),
                   trailing: _NextAction(booking: b),
                 ),
@@ -69,16 +83,31 @@ class _NextAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bp = context.read<BookingProvider>();
+    Future<void> go(String s) async {
+      try {
+        await bp.setStatus(booking.id, s);
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('خطأ: $e')));
+        }
+      }
+    }
+
     switch (booking.status) {
       case BookingStatus.accepted:
         return ElevatedButton(
-          onPressed: () => bp.setStatus(booking.id, BookingStatus.inProgress),
-          child: const Text('بدء'),
+          style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange),
+          onPressed: () => go(BookingStatus.inProgress),
+          child: const Text('بدء ▶'),
         );
       case BookingStatus.inProgress:
         return ElevatedButton(
-          onPressed: () => bp.setStatus(booking.id, BookingStatus.completed),
-          child: const Text('إنهاء'),
+          style:
+              ElevatedButton.styleFrom(backgroundColor: techGreen),
+          onPressed: () => go(BookingStatus.completed),
+          child: const Text('إنهاء ✔'),
         );
       default:
         return const Icon(Icons.check_circle, color: Colors.green);
