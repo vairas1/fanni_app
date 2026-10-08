@@ -24,9 +24,15 @@ jobs:
           if [ -f android/app/build.gradle.kts ]; then
             sed -i 's/minSdk.*/minSdk = 23/' android/app/build.gradle.kts
             grep -q "minSdk = 23" android/app/build.gradle.kts
+            # flutter_local_notifications يتطلب desugaring
+            sed -i 's/sourceCompatibility = JavaVersion.VERSION_11/sourceCompatibility = JavaVersion.VERSION_11\n        coreLibraryDesugaringEnabled = true/' android/app/build.gradle.kts
+            grep -q "coreLibraryDesugaringEnabled = true" android/app/build.gradle.kts
+            printf '\ndependencies {\n    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")\n}\n' >> android/app/build.gradle.kts
           else
             sed -i 's/minSdk.*/minSdkVersion 23/' android/app/build.gradle
             grep -q "minSdkVersion 23" android/app/build.gradle
+            sed -i 's/sourceCompatibility.*/sourceCompatibility = "11"\n        coreLibraryDesugaringEnabled true/' android/app/build.gradle
+            printf "\ndependencies {\n    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'\n}\n" >> android/app/build.gradle
           fi
           # صلاحيات الموقع لزرار الموقع الحالي
           sed -i 's|<application|    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>\n    <application|' android/app/src/main/AndroidManifest.xml
