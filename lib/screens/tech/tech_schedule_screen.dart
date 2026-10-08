@@ -25,6 +25,14 @@ class TechScheduleScreen extends StatelessWidget {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirestoreService.techBookings(uid),
         builder: (c, snap) {
+          if (snap.hasError) {
+            return Center(
+                child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text('خطأ في التحميل:\n${snap.error}',
+                  textAlign: TextAlign.center),
+            ));
+          }
           if (!snap.hasData) {
             return const Center(child: CircularProgressIndicator());
           }

@@ -8,12 +8,18 @@ class FirestoreService {
   static final _db = FirebaseFirestore.instance;
 
   // ---------- الفنيون ----------
+  // ملاحظة: فلتر واحد فقط لتجنب الحاجة لفهرس مركب — يُستكمل الفلترة في الواجهة
   static Stream<QuerySnapshot> techniciansStream({String? serviceId}) {
-    var q = _db.collection('technicians').where('available', isEqualTo: true);
     if (serviceId != null && serviceId.isNotEmpty) {
-      q = q.where('services', arrayContains: serviceId);
+      return _db
+          .collection('technicians')
+          .where('services', arrayContains: serviceId)
+          .snapshots();
     }
-    return q.snapshots();
+    return _db
+        .collection('technicians')
+        .where('available', isEqualTo: true)
+        .snapshots();
   }
 
   // ---------- الحجوزات ----------
@@ -27,19 +33,19 @@ class FirestoreService {
   }
 
   static Stream<QuerySnapshot> clientBookings(String clientId) {
+    // بدون orderBy لتجنب الفهرس المركب — الترتيب يتم في الواجهة
     return _db
         .collection('bookings')
         .where('clientId', isEqualTo: clientId)
-        .orderBy('createdAt', descending: true)
         .snapshots();
   }
 
   static Stream<QuerySnapshot> techBookings(String techId, {String? status}) {
-    var q = _db
+    // بدون orderBy لتجنب الفهرس المركب — الترتيب يتم في الواجهة
+    return _db
         .collection('bookings')
         .where('technicianId', isEqualTo: techId)
-        .orderBy('createdAt', descending: true);
-    return q.snapshots();
+        .snapshots();
   }
 
   static Future<void> updateStatus(String bookingId, String status) {

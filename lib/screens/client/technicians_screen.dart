@@ -33,21 +33,30 @@ class TechniciansScreen extends StatelessWidget {
                   FirestoreService.techniciansStream(serviceId: service.id),
               builder: (c, snap) {
                 if (snap.hasError) {
-                  return Center(child: Text('خطأ: ${snap.error}'));
+                  return Center(
+                      child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text('خطأ في التحميل:\n${snap.error}',
+                        textAlign: TextAlign.center),
+                  ));
                 }
                 if (!snap.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
                 final docs = snap.data!.docs;
-                if (docs.isEmpty) {
+                final techs = docs
+                    .map((d) => Technician.fromDoc(d))
+                    .where((t) => t.available)
+                    .toList();
+                if (techs.isEmpty) {
                   return const Center(
                       child: Text('لا يوجد فنيون متاحون حالياً'));
                 }
                 return ListView.builder(
                   padding: const EdgeInsets.all(12),
-                  itemCount: docs.length,
+                  itemCount: techs.length,
                   itemBuilder: (c, i) {
-                    final t = Technician.fromDoc(docs[i]);
+                    final t = techs[i];
                     return Card(
                       child: Padding(
                         padding: const EdgeInsets.all(8),

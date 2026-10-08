@@ -36,6 +36,14 @@ class MyBookingsScreen extends StatelessWidget {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirestoreService.clientBookings(uid),
         builder: (c, snap) {
+          if (snap.hasError) {
+            return Center(
+                child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text('خطأ في التحميل:\n${snap.error}',
+                  textAlign: TextAlign.center),
+            ));
+          }
           if (!snap.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -45,11 +53,13 @@ class MyBookingsScreen extends StatelessWidget {
                 child: Text('لا توجد حجوزات بعد\nاحجز من تبويب الخدمات 🛠️',
                     textAlign: TextAlign.center));
           }
+          final list = docs.map((d) => Booking.fromDoc(d)).toList()
+            ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
           return ListView.builder(
             padding: const EdgeInsets.all(12),
-            itemCount: docs.length,
+            itemCount: list.length,
             itemBuilder: (c, i) {
-              final b = Booking.fromDoc(docs[i]);
+              final b = list[i];
               final sc = serviceColor(b.serviceId);
               return Card(
                 child: ListTile(

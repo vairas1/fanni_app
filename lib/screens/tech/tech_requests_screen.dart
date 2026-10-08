@@ -26,13 +26,22 @@ class TechRequestsScreen extends StatelessWidget {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirestoreService.techBookings(uid),
         builder: (c, snap) {
+          if (snap.hasError) {
+            return Center(
+                child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text('خطأ في التحميل:\n${snap.error}',
+                  textAlign: TextAlign.center),
+            ));
+          }
           if (!snap.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
           final all =
               snap.data!.docs.map((d) => Booking.fromDoc(d)).toList();
           final pending =
-              all.where((b) => b.status == BookingStatus.pending).toList();
+              all.where((b) => b.status == BookingStatus.pending).toList()
+                ..sort((a, b) => a.dateTime.compareTo(b.dateTime));
           if (pending.isEmpty) {
             return const Center(
                 child: Text('لا توجد طلبات جديدة 🎉',
