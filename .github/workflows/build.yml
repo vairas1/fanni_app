@@ -20,9 +20,14 @@ jobs:
           flutter create --platforms=android --project-name fanni_app --org com.example.fanni .
           rm -rf lib && cp -r /tmp/keep/lib lib && cp /tmp/keep/pubspec.yaml pubspec.yaml
           if [ -f /tmp/keep/gs.json ]; then cp /tmp/keep/gs.json android/app/google-services.json; fi
-          # firebase-auth يتطلب minSdk >= 23
-          sed -i 's/minSdk.*/minSdkVersion 23/' android/app/build.gradle
-          grep -q "minSdkVersion 23" android/app/build.gradle
+          # firebase-auth يتطلب minSdk >= 23 (يدعم Groovy و Kotlin DSL)
+          if [ -f android/app/build.gradle.kts ]; then
+            sed -i 's/minSdk.*/minSdk = 23/' android/app/build.gradle.kts
+            grep -q "minSdk = 23" android/app/build.gradle.kts
+          else
+            sed -i 's/minSdk.*/minSdkVersion 23/' android/app/build.gradle
+            grep -q "minSdkVersion 23" android/app/build.gradle
+          fi
           # صلاحيات الموقع لزرار الموقع الحالي
           sed -i 's|<application|    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>\n    <application|' android/app/src/main/AndroidManifest.xml
           grep -q "ACCESS_FINE_LOCATION" android/app/src/main/AndroidManifest.xml
