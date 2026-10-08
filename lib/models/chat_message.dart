@@ -5,6 +5,7 @@ class ChatMessage {
   final String senderId;
   final String text;
   final String? imageUrl;
+  final String? imageBase64;
   final DateTime createdAt;
 
   ChatMessage({
@@ -12,6 +13,7 @@ class ChatMessage {
     required this.senderId,
     this.text = '',
     this.imageUrl,
+    this.imageBase64,
     required this.createdAt,
   });
 
@@ -27,6 +29,7 @@ class ChatMessage {
       senderId: (m['senderId'] ?? '') as String,
       text: (m['text'] ?? '') as String,
       imageUrl: m['imageUrl'] as String?,
+      imageBase64: m['imageBase64'] as String?,
       createdAt: parseTs(m['createdAt']),
     );
   }

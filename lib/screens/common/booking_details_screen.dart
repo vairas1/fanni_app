@@ -95,7 +95,8 @@ class BookingDetailsScreen extends StatelessWidget {
               if (isTech) _techActions(context, b),
               if (!isTech &&
                   b.status == BookingStatus.completed &&
-                  b.rating == null)
+                  b.rating == null &&
+                  b.technicianId.isNotEmpty)
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.amber[700]),

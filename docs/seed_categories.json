@@ -1,0 +1,26 @@
+[
+  {
+    "_collection": "categories",
+    "_docId": "pharmacies",
+    "nameAr": "صيدليات",
+    "descAr": "اطلب أدوية من أقرب صيدلية",
+    "emoji": "💊",
+    "color": 4283215696,
+    "_places": [
+      {"_docId": "p1", "name": "صيدلية الشفا", "phone": "01001112233", "address": "شارع 15 مدينة نصر", "emoji": "💊", "ratingAvg": 4.7, "ratingCount": 45},
+      {"_docId": "p2", "name": "صيدلية النور", "phone": "01004445566", "address": "المعادي الجديدة", "emoji": "💊", "ratingAvg": 4.5, "ratingCount": 30}
+    ]
+  },
+  {
+    "_collection": "categories",
+    "_docId": "markets",
+    "nameAr": "سوبر ماركت",
+    "descAr": "اطلب احتياجاتك من أقرب ماركت",
+    "emoji": "🛒",
+    "color": 4282739162,
+    "_places": [
+      {"_docId": "m1", "name": "ماركت البركة", "phone": "01007778899", "address": "شارع 9 المعادي", "emoji": "🛒", "ratingAvg": 4.6, "ratingCount": 60},
+      {"_docId": "m2", "name": "ماركت العائلة", "phone": "01000011122", "address": "زهراء مدينة نصر", "emoji": "🛒", "ratingAvg": 4.4, "ratingCount": 25}
+    ]
+  }
+]

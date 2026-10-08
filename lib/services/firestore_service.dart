@@ -95,6 +95,7 @@ class FirestoreService {
     required String senderId,
     String text = '',
     String? imageUrl,
+    String? imageBase64,
   }) {
     return _db
         .collection('bookings')
@@ -104,11 +105,48 @@ class FirestoreService {
       'senderId': senderId,
       'text': text,
       'imageUrl': imageUrl,
+      'imageBase64': imageBase64,
       'createdAt': FieldValue.serverTimestamp(),
     });
   }
 
-  // ---------- رفع صورة دردشة ----------
+  // ---------- الأقسام والأماكن (منيو ديناميكي) ----------
+  static Stream<QuerySnapshot> categoriesStream() {
+    return _db.collection('categories').snapshots();
+  }
+
+  static Stream<QuerySnapshot> placesStream(String categoryId) {
+    return _db.collection('categories').doc(categoryId).collection('places').snapshots();
+  }
+
+  // ---------- حذف وتنظيف تلقائي ----------
+  static Future<void> deleteBooking(String bookingId) {
+    return _db.collection('bookings').doc(bookingId).delete();
+  }
+
+  static bool _cleaned = false;
+
+  /// مسح تلقائي للحجوزات المكتملة/الملغية الأقدم من 7 أيام (يعمل مرة واحدة)
+  static void cleanupOldBookings(List<QueryDocumentSnapshot> docs) {
+    if (_cleaned) return;
+    _cleaned = true;
+    try {
+      final limit = DateTime.now().subtract(const Duration(days: 7));
+      var n = 0;
+      for (final d in docs) {
+        if (n >= 10) break;
+        final m = (d.data() as Map<String, dynamic>?) ?? {};
+        final st = (m['status'] ?? '') as String;
+        if (st != 'completed' && st != 'cancelled') continue;
+        final ts = m['createdAt'];
+        DateTime? created;
+        if (ts is Timestamp) created = ts.toDate();
+        if (created == null || created.isAfter(limit)) continue;
+        n++;
+        _db.collection('bookings').doc(d.id).delete().catchError((_) {});
+      }
+    } catch (_) {}
+  }
   static Future<String> uploadChatImage(String bookingId, XFile file) async {
     final ref = FirebaseStorage.instance.ref().child(
         'chats/$bookingId/${DateTime.now().millisecondsSinceEpoch}_${file.name}');

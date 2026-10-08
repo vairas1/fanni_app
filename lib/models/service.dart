@@ -85,3 +85,75 @@ Color serviceColor(String serviceId) {
   }
   return const Color(0xFF0D47A1);
 }
+
+/// قسم قادم من Firestore (لإضافة أقسام جديدة بدون تحديث التطبيق)
+class RemoteCategory {
+  final String id;
+  final String nameAr;
+  final String descAr;
+  final String imageEmoji;
+  final Color color;
+
+  RemoteCategory({
+    required this.id,
+    required this.nameAr,
+    required this.descAr,
+    required this.imageEmoji,
+    required this.color,
+  });
+
+  factory RemoteCategory.fromDoc(dynamic doc) {
+    final m = (doc.data() as Map<String, dynamic>?) ?? {};
+    return RemoteCategory(
+      id: doc.id,
+      nameAr: (m['nameAr'] ?? m['name'] ?? 'قسم') as String,
+      descAr: (m['descAr'] ?? m['desc'] ?? '') as String,
+      imageEmoji: (m['emoji'] ?? '🏷️') as String,
+      color: Color(((m['color'] ?? 0xFF0D47A1) as num).toInt()),
+    );
+  }
+
+  ServiceModel toService() => ServiceModel(
+        id: 'remote_$id',
+        nameAr: nameAr,
+        descAr: descAr,
+        icon: Icons.store,
+        priceFrom: 0,
+        imageEmoji: imageEmoji,
+        color: color,
+      );
+}
+
+/// مكان داخل قسم (صيدلية / سوبر ماركت ...)
+class PlaceModel {
+  final String id;
+  final String name;
+  final String phone;
+  final String address;
+  final String emoji;
+  final double ratingAvg;
+  final int ratingCount;
+
+  PlaceModel({
+    required this.id,
+    required this.name,
+    this.phone = '',
+    this.address = '',
+    this.emoji = '🏪',
+    this.ratingAvg = 0,
+    this.ratingCount = 0,
+  });
+
+  factory PlaceModel.fromDoc(dynamic doc) {
+    final m = (doc.data() as Map<String, dynamic>?) ?? {};
+    return PlaceModel(
+      id: doc.id,
+      name: (m['name'] ?? 'مكان') as String,
+      phone: (m['phone'] ?? '') as String,
+      address: (m['address'] ?? '') as String,
+      emoji: (m['emoji'] ?? '🏪') as String,
+      ratingAvg: ((m['ratingAvg'] ?? 0) as num).toDouble(),
+      ratingCount: ((m['ratingCount'] ?? 0) as num).toInt(),
+    );
+  }
+}

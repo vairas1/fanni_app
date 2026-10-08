@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +23,14 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final _ctrl = TextEditingController();
+  bool _showEmoji = false;
+
+  static const _emojis = [
+    '😀', '😁', '😂', '🤣', '😊', '😍', '😎', '🤔',
+    '👍', '👎', '🙏', '👏', '👋', '💪', '✅', '❌',
+    '⏰', '📍', '📷', '📞', '🏠', '🚗', '💰', '⭐',
+    '🎉', '🔧', '📹', '📡', '🔔', '🌐', '💡', '❄️',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +91,17 @@ class _ChatScreenState extends State<ChatScreen> {
                           crossAxisAlignment:
                               CrossAxisAlignment.start,
                           children: [
+                            if (m.imageBase64 != null &&
+                                m.imageBase64!.isNotEmpty)
+                              ClipRRect(
+                                borderRadius:
+                                    BorderRadius.circular(8),
+                                child: Image.memory(
+                                  base64Decode(m.imageBase64!),
+                                  height: 170,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             if (m.imageUrl != null)
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
@@ -114,6 +135,29 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
           if (chat.sending) const LinearProgressIndicator(),
+          if (_showEmoji)
+            Container(
+              height: 220,
+              color: Colors.grey[100],
+              child: GridView.builder(
+                padding: const EdgeInsets.all(8),
+                gridDelegate:
+                    const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 8),
+                itemCount: _emojis.length,
+                itemBuilder: (c, i) => InkWell(
+                  onTap: () {
+                    _ctrl.text += _emojis[i];
+                    _ctrl.selection = TextSelection.fromPosition(
+                        TextPosition(offset: _ctrl.text.length));
+                  },
+                  child: Center(
+                      child: Text(_emojis[i],
+                          style:
+                              const TextStyle(fontSize: 26))),
+                ),
+              ),
+            ),
           SafeArea(
             child: Container(
               padding: const EdgeInsets.all(8),
@@ -128,6 +172,16 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
               child: Row(
                 children: [
+                  IconButton(
+                    icon: Icon(
+                        _showEmoji
+                            ? Icons.keyboard
+                            : Icons.emoji_emotions,
+                        color: sc),
+                    tooltip: 'إيموجي 😀',
+                    onPressed: () => setState(
+                        () => _showEmoji = !_showEmoji),
+                  ),
                   IconButton(
                     icon: Icon(Icons.image, color: sc),
                     tooltip: 'إرفاق صورة 📷',

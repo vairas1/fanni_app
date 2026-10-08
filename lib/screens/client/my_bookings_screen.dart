@@ -55,13 +55,58 @@ class MyBookingsScreen extends StatelessWidget {
           }
           final list = docs.map((d) => Booking.fromDoc(d)).toList()
             ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          // مسح تلقائي للمنتهية الأقدم من 7 أيام
+          FirestoreService.cleanupOldBookings(docs);
           return ListView.builder(
             padding: const EdgeInsets.all(12),
             itemCount: list.length,
             itemBuilder: (c, i) {
               final b = list[i];
               final sc = serviceColor(b.serviceId);
-              return Card(
+              return Dismissible(
+                key: ValueKey(b.id),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  alignment: Alignment.centerLeft,
+                  padding: const EdgeInsets.only(left: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child:
+                      const Icon(Icons.delete, color: Colors.white),
+                ),
+                confirmDismiss: (_) async {
+                  return await showDialog<bool>(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: const Text('مسح الحجز؟'),
+                          content: const Text(
+                              'سيتم مسح هذا الحجز نهائياً'),
+                          actions: [
+                            TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(context, false),
+                                child: const Text('إلغاء')),
+                            TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(context, true),
+                                child: const Text('مسح',
+                                    style:
+                                        TextStyle(color: Colors.red))),
+                          ],
+                        ),
+                      ) ??
+                      false;
+                },
+                onDismissed: (_) {
+                  FirestoreService.deleteBooking(b.id).catchError(
+                      (_) {});
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('تم مسح الحجز 🗑️')));
+                },
+                child: Card(
                 child: ListTile(
                   leading: CircleAvatar(
                     backgroundColor: sc,
@@ -110,6 +155,7 @@ class MyBookingsScreen extends StatelessWidget {
                         builder: (_) =>
                             BookingDetailsScreen(bookingId: b.id)),
                   ),
+                ),
                 ),
               );
             },

@@ -39,6 +39,7 @@ class TechRequestsScreen extends StatelessWidget {
           }
           final all =
               snap.data!.docs.map((d) => Booking.fromDoc(d)).toList();
+          FirestoreService.cleanupOldBookings(snap.data!.docs);
           final pending =
               all.where((b) => b.status == BookingStatus.pending).toList()
                 ..sort((a, b) => a.dateTime.compareTo(b.dateTime));

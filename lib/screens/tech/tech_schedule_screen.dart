@@ -44,6 +44,7 @@ class TechScheduleScreen extends StatelessWidget {
                   b.status == BookingStatus.completed)
               .toList()
             ..sort((a, b) => a.dateTime.compareTo(b.dateTime));
+          FirestoreService.cleanupOldBookings(snap.data!.docs);
           if (all.isEmpty) {
             return const Center(
                 child: Text('لا توجد مهام مجدولة'));

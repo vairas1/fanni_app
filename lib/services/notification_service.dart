@@ -25,21 +25,31 @@ class NotificationService {
     FirebaseMessaging.onMessage.listen((RemoteMessage msg) {
       final n = msg.notification;
       if (n != null) {
-        _local.show(
-          n.hashCode,
-          n.title,
-          n.body,
-          const NotificationDetails(
-            android: AndroidNotificationDetails(
-              'bookings_channel',
-              'تنبيهات الحجوزات',
-              importance: Importance.max,
-              priority: Priority.high,
-            ),
-          ),
-        );
+        showLocal(title: n.title ?? 'تنبيه', body: n.body ?? '');
       }
     });
+  }
+
+  /// إشعار محلي فوري (يُستخدم أيضاً لتنبيه الفني بحجز جديد داخل التطبيق)
+  static Future<void> showLocal({
+    required String title,
+    required String body,
+  }) async {
+    try {
+      await _local.show(
+        DateTime.now().millisecondsSinceEpoch ~/ 1000,
+        title,
+        body,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'bookings_channel',
+            'تنبيهات الحجوزات',
+            importance: Importance.max,
+            priority: Priority.high,
+          ),
+        ),
+      );
+    } catch (_) {}
   }
 
   /// حفظ توكن الجهاز في مستند المستخدم ليستعمله Cloud Functions
