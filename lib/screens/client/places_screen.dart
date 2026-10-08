@@ -25,7 +25,15 @@ class PlacesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('$emoji $title'), backgroundColor: color),
-      body: StreamBuilder<QuerySnapshot>(
+      body: Builder(
+        builder: (context) {
+          final staticPlaces = builtinPlaces[categoryId.startsWith('remote_')
+              ? categoryId
+              : 'remote_$categoryId'];
+          if (staticPlaces != null) {
+            return _placesList(context, staticPlaces);
+          }
+          return StreamBuilder<QuerySnapshot>(
         stream: FirestoreService.placesStream(categoryId),
         builder: (c, snap) {
           if (snap.hasError) {
@@ -45,7 +53,16 @@ class PlacesScreen extends StatelessWidget {
             return const Center(
                 child: Text('لا توجد أماكن مضافة بعد في هذا القسم'));
           }
-          return ListView.builder(
+          return _placesList(context, places);
+        },
+      );
+        },
+      ),
+    );
+  }
+
+  Widget _placesList(BuildContext context, List<PlaceModel> places) {
+    return ListView.builder(
             padding: const EdgeInsets.all(12),
             itemCount: places.length,
             itemBuilder: (c, i) {
@@ -120,8 +137,5 @@ class PlacesScreen extends StatelessWidget {
               );
             },
           );
-        },
-      ),
-    );
   }
 }

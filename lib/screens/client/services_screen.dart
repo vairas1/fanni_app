@@ -45,7 +45,8 @@ class ServicesScreen extends StatelessWidget {
             child: StreamBuilder<QuerySnapshot>(
               stream: FirestoreService.categoriesStream(),
               builder: (c, snap) {
-                final List<ServiceModel> items = List.of(appServices);
+                final List<ServiceModel> items = List.of(appServices)
+                  ..addAll(extraCategories);
                 if (snap.hasData) {
                   for (final d in snap.data!.docs) {
                     try {

@@ -78,7 +78,67 @@ const appServices = <ServiceModel>[
   ),
 ];
 
-/// لون الخدمة حسب الـ id (يُستخدم في الحجوزات والدردشة)
+/// أقسام إضافية جاهزة داخل التطبيق (تظهر فوراً بدون إعداد)
+List<ServiceModel> get extraCategories => [
+      const ServiceModel(
+        id: 'remote_pharmacies',
+        nameAr: 'صيدليات',
+        descAr: 'اطلب أدوية من أقرب صيدلية',
+        icon: Icons.local_pharmacy,
+        priceFrom: 0,
+        imageEmoji: '💊',
+        color: Color(0xFF00838F),
+      ),
+      const ServiceModel(
+        id: 'remote_markets',
+        nameAr: 'سوبر ماركت',
+        descAr: 'اطلب احتياجاتك من أقرب ماركت',
+        icon: Icons.shopping_cart,
+        priceFrom: 0,
+        imageEmoji: '🛒',
+        color: Color(0xFF2E7D32),
+      ),
+    ];
+
+/// أماكن الأقسام الجاهزة (الاسم + التليفون + العنوان)
+Map<String, List<PlaceModel>> get builtinPlaces => {
+      'remote_pharmacies': [
+        PlaceModel(
+            id: 'p1',
+            name: 'صيدلية الشفا',
+            phone: '01001112233',
+            address: 'شارع 15 مدينة نصر',
+            emoji: '💊',
+            ratingAvg: 4.7,
+            ratingCount: 45),
+        PlaceModel(
+            id: 'p2',
+            name: 'صيدلية النور',
+            phone: '01004445566',
+            address: 'المعادي الجديدة',
+            emoji: '💊',
+            ratingAvg: 4.5,
+            ratingCount: 30),
+      ],
+      'remote_markets': [
+        PlaceModel(
+            id: 'm1',
+            name: 'ماركت البركة',
+            phone: '01007778899',
+            address: 'شارع 9 المعادي',
+            emoji: '🛒',
+            ratingAvg: 4.6,
+            ratingCount: 60),
+        PlaceModel(
+            id: 'm2',
+            name: 'ماركت العائلة',
+            phone: '01000011122',
+            address: 'زهراء مدينة نصر',
+            emoji: '🛒',
+            ratingAvg: 4.4,
+            ratingCount: 25),
+      ],
+    };
 Color serviceColor(String serviceId) {
   for (final s in appServices) {
     if (s.id == serviceId) return s.color;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +28,34 @@ class _BookingScreenState extends State<BookingScreen> {
   TimeOfDay _time = const TimeOfDay(hour: 10, minute: 0);
   final _addressCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
+  bool _locating = false;
+
+  /// زرار إرسال الموقع الحالي 📍
+  Future<void> _useMyLocation() async {
+    setState(() => _locating = true);
+    try {
+      var perm = await Geolocator.checkPermission();
+      if (perm == LocationPermission.denied) {
+        perm = await Geolocator.requestPermission();
+      }
+      if (perm == LocationPermission.denied ||
+          perm == LocationPermission.deniedForever) {
+        throw 'يرجى السماح بالوصول للموقع من إعدادات الموبايل';
+      }
+      final p = await Geolocator.getCurrentPosition();
+      if (!mounted) return;
+      setState(() => _pos = LatLng(p.latitude, p.longitude));
+      _mapCtrl.move(_pos, 15);
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تم تحديد موقعك الحالي 📍')));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('$e')));
+    } finally {
+      if (mounted) setState(() => _locating = false);
+    }
+  }
 
   Future<void> _pickDate() async {
     final d = await showDatePicker(
@@ -114,6 +143,21 @@ class _BookingScreenState extends State<BookingScreen> {
           const Text('حدد موقعك على الخريطة (اضغط على أي مكان):',
               style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: _locating ? null : _useMyLocation,
+              icon: _locating
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child:
+                          CircularProgressIndicator(strokeWidth: 2))
+                  : const Icon(Icons.my_location),
+              label: const Text('📍 إرسال موقعي الحالي'),
+            ),
+          ),
+          const SizedBox(height: 4),
           SizedBox(
             height: 260,
             child: ClipRRect(
