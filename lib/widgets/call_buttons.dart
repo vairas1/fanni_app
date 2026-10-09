@@ -33,8 +33,7 @@ class CallButtons extends StatelessWidget {
     final uri =
         Uri.parse('https://wa.me/${toWhatsApp(phone)}');
     try {
-      if (await canLaunchUrl(uri,
-          mode: LaunchMode.externalApplication)) {
+      if (await canLaunchUrl(uri)) {
         await launchUrl(uri,
             mode: LaunchMode.externalApplication);
       } else if (context.mounted) {
@@ -63,8 +62,7 @@ class CallButtons extends StatelessWidget {
   Future<void> _whatsapp(BuildContext context) async {
     final uri = Uri.parse('https://wa.me/${toWhatsApp(phone)}');
     try {
-      if (await canLaunchUrl(uri,
-          mode: LaunchMode.externalApplication)) {
+      if (await canLaunchUrl(uri)) {
         await launchUrl(uri,
             mode: LaunchMode.externalApplication);
       } else {
@@ -175,8 +173,7 @@ class DeveloperCard extends StatelessWidget {
             final uri = Uri.parse(
                 'https://wa.me/${CallButtons.toWhatsApp(phone)}');
             try {
-              if (await canLaunchUrl(uri,
-                  mode: LaunchMode.externalApplication)) {
+              if (await canLaunchUrl(uri)) {
                 await launchUrl(uri,
                     mode: LaunchMode.externalApplication);
               }

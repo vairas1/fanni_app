@@ -174,8 +174,8 @@ class _BookingScreenState extends State<BookingScreen> {
                       color: Colors.white),
               label: Text(
                   _located
-                      ? 'تم إرسال الموقع ✅ (اضغط لتحديثه)',
-                      '📍 إرسال موقعي الحالي للفني',
+                      ? 'تم إرسال الموقع ✅ (اضغط لتحديثه)'
+                      : '📍 إرسال موقعي الحالي للفني',
                   style: const TextStyle(
                       fontSize: 16, color: Colors.white)),
             ),
