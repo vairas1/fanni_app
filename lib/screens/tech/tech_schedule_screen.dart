@@ -8,6 +8,7 @@ import '../../models/service.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/booking_provider.dart';
 import '../../services/firestore_service.dart';
+import '../../widgets/screen_bg.dart';
 import '../common/booking_details_screen.dart';
 import 'tech_requests_screen.dart' show techGreen;
 
@@ -22,7 +23,8 @@ class TechScheduleScreen extends StatelessWidget {
       appBar: AppBar(
           title: const Text('📅 جدولي الزمني'),
           backgroundColor: techGreen),
-      body: StreamBuilder<QuerySnapshot>(
+      body: ScreenBg(
+        child: StreamBuilder<QuerySnapshot>(
         stream: FirestoreService.techBookings(uid),
         builder: (c, snap) {
           if (snap.hasError) {
@@ -80,6 +82,7 @@ class TechScheduleScreen extends StatelessWidget {
             },
           );
         },
+      ),
       ),
     );
   }

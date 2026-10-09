@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import '../../models/service.dart';
 import '../../models/technician.dart';
 import '../../services/firestore_service.dart';
+import '../../widgets/call_buttons.dart';
 import '../../widgets/rating_stars.dart';
+import '../../widgets/screen_bg.dart';
 import 'booking_screen.dart';
 
 class TechniciansScreen extends StatelessWidget {
@@ -18,7 +20,8 @@ class TechniciansScreen extends StatelessWidget {
         title: Text('${service.imageEmoji} ${service.nameAr}'),
         backgroundColor: service.color,
       ),
-      body: Column(
+      body: ScreenBg(
+        child: Column(
         children: [
           Container(
             width: double.infinity,
@@ -104,6 +107,28 @@ class TechniciansScreen extends StatelessWidget {
                               ),
                               child: const Text('احجز'),
                             ),
+                            if (t.phone.isNotEmpty)
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    tooltip: 'اتصال 📞',
+                                    icon: Icon(Icons.call,
+                                        color: service.color),
+                                    onPressed: () => CallButtons
+                                        .callPhone(context, t.phone),
+                                  ),
+                                  IconButton(
+                                    tooltip: 'واتساب 💬',
+                                    icon: const Text('💬',
+                                        style:
+                                            TextStyle(fontSize: 20)),
+                                    onPressed: () => CallButtons
+                                        .whatsapp(
+                                            context, t.phone),
+                                  ),
+                                ],
+                              ),
                           ],
                         ),
                       ),
@@ -114,6 +139,7 @@ class TechniciansScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }

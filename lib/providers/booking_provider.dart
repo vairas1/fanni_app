@@ -19,6 +19,8 @@ class BookingProvider extends ChangeNotifier {
     required String address,
     required DateTime dateTime,
     String notes = '',
+    String technicianPhone = '',
+    String clientPhone = '',
   }) async {
     _loading = true;
     notifyListeners();
@@ -35,6 +37,8 @@ class BookingProvider extends ChangeNotifier {
         'address': address,
         'dateTime': dateTime,
         'notes': notes,
+        'technicianPhone': technicianPhone,
+        'clientPhone': clientPhone,
       });
       return id;
     } finally {

@@ -9,6 +9,7 @@ import '../../models/service.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/chat_provider.dart';
 import '../../services/firestore_service.dart';
+import '../../widgets/screen_bg.dart';
 
 /// الدردشة المباشرة بين العميل والفني مع إرفاق صور 📷
 class ChatScreen extends StatefulWidget {
@@ -40,7 +41,8 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       appBar: AppBar(
           title: const Text('💬 الدردشة المباشرة'), backgroundColor: sc),
-      body: Column(
+      body: ScreenBg(
+        child: Column(
         children: [
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
@@ -230,6 +232,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

@@ -8,6 +8,7 @@ import '../../models/booking.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/firestore_service.dart';
 import '../../services/notification_service.dart';
+import '../../services/tech_location.dart';
 import 'tech_requests_screen.dart';
 import 'tech_schedule_screen.dart';
 import '../client/profile_screen.dart';
@@ -30,6 +31,8 @@ class _TechShellState extends State<TechShell> {
   StreamSubscription<QuerySnapshot>? _sub;
   final Set<String> _seen = {};
   bool _first = true;
+  final _locService = TechLocationService();
+  bool _locStarted = false;
 
   @override
   void initState() {
@@ -45,7 +48,19 @@ class _TechShellState extends State<TechShell> {
       if (_first) {
         _first = false;
         _seen.addAll(snap.docs.map((d) => d.id));
-        return;
+      }
+      // بدء/إيقاف مشاركة الموقع حسب وجود مهام جارية
+      final hasActive = snap.docs.any((d) {
+        final m = (d.data() as Map<String, dynamic>?) ?? {};
+        final s = (m['status'] ?? '') as String;
+        return s == 'accepted' || s == 'in_progress';
+      });
+      if (hasActive && !_locStarted) {
+        _locStarted = true;
+        _locService.start(uid);
+      } else if (!hasActive && _locStarted) {
+        _locStarted = false;
+        _locService.stop();
       }
       for (final d in snap.docs) {
         if (_seen.contains(d.id)) continue;
@@ -71,6 +86,7 @@ class _TechShellState extends State<TechShell> {
   @override
   void dispose() {
     _sub?.cancel();
+    _locService.dispose();
     super.dispose();
   }
 

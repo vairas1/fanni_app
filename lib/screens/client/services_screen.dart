@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../models/service.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/firestore_service.dart';
+import '../../widgets/screen_bg.dart';
 import 'places_screen.dart';
 import 'technicians_screen.dart';
 
@@ -17,7 +18,8 @@ class ServicesScreen extends StatelessWidget {
     final name = context.watch<AuthProvider>().name;
     return Scaffold(
       appBar: AppBar(title: const Text('🔧 الخدمات والأقسام')),
-      body: Column(
+      body: ScreenBg(
+        child: Column(
         children: [
           Container(
             width: double.infinity,
@@ -144,6 +146,7 @@ class ServicesScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }

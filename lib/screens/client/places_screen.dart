@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import '../../models/service.dart';
 import '../../models/technician.dart';
 import '../../services/firestore_service.dart';
+import '../../widgets/call_buttons.dart';
 import '../../widgets/rating_stars.dart';
+import '../../widgets/screen_bg.dart';
 import 'booking_screen.dart';
 
 /// منيو الأماكن داخل القسم (صيدليات / سوبر ماركت ...) + طلب من المكان
@@ -25,7 +27,8 @@ class PlacesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('$emoji $title'), backgroundColor: color),
-      body: Builder(
+      body: ScreenBg(
+        child: Builder(
         builder: (context) {
           final staticPlaces = builtinPlaces[categoryId.startsWith('remote_')
               ? categoryId
@@ -102,34 +105,61 @@ class PlacesScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: color),
-                        onPressed: () {
-                          // طلب من المكان: حجز بدون فني معيّن
-                          final svc = ServiceModel(
-                            id: 'remote_$categoryId',
-                            nameAr: 'طلب من ${p.name}',
-                            descAr: title,
-                            icon: Icons.store,
-                            priceFrom: 0,
-                            imageEmoji: p.emoji,
-                            color: color,
-                          );
-                          final tech = Technician(
-                            uid: '',
-                            name: p.name,
-                            phone: p.phone,
-                          );
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => BookingScreen(
-                                  service: svc, technician: tech),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: color),
+                            onPressed: () {
+                              final svc = ServiceModel(
+                                id: 'remote_$categoryId',
+                                nameAr: 'طلب من ${p.name}',
+                                descAr: title,
+                                icon: Icons.store,
+                                priceFrom: 0,
+                                imageEmoji: p.emoji,
+                                color: color,
+                              );
+                              final tech = Technician(
+                                uid: '',
+                                name: p.name,
+                                phone: p.phone,
+                              );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => BookingScreen(
+                                      service: svc, technician: tech),
+                                ),
+                              );
+                            },
+                            child: const Text('اطلب'),
+                          ),
+                          if (p.phone.isNotEmpty)
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  tooltip: 'اتصال 📞',
+                                  icon: Icon(Icons.call,
+                                      color: color),
+                                  onPressed: () =>
+                                      CallButtons.callPhone(
+                                          context, p.phone),
+                                ),
+                                IconButton(
+                                  tooltip: 'واتساب 💬',
+                                  icon: const Text('💬',
+                                      style: TextStyle(
+                                          fontSize: 20)),
+                                  onPressed: () =>
+                                      CallButtons.whatsapp(
+                                          context, p.phone),
+                                ),
+                              ],
                             ),
-                          );
-                        },
-                        child: const Text('اطلب'),
+                        ],
                       ),
                     ],
                   ),

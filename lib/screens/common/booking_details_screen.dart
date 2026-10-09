@@ -1,19 +1,83 @@
+import 'dart:math' show asin, cos, pi, sin, sqrt;
+
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:intl/intl.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/booking.dart';
 import '../../models/service.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/booking_provider.dart';
+import '../../services/firestore_service.dart';
+import '../../services/notification_service.dart';
+import '../../widgets/call_buttons.dart';
+import '../../widgets/screen_bg.dart';
 import '../../widgets/rating_dialog.dart';
 import 'chat_screen.dart';
 
-/// تفاصيل الحجز: الحالة + العنوان + (دردشة / تحديث حالة / تقييم)
-class BookingDetailsScreen extends StatelessWidget {
+/// تفاصيل الحجز + تتبع مباشر لموقع الفني + منبه وصول 🔔
+class BookingDetailsScreen extends StatefulWidget {
   final String bookingId;
   const BookingDetailsScreen({super.key, required this.bookingId});
+
+  @override
+  State<BookingDetailsScreen> createState() => _BookingDetailsScreenState();
+}
+
+class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
+  final _player = AudioPlayer();
+  bool _rung = false;
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
+  }
+
+  /// المسافة بالكيلومتر (Haversine)
+  double _km(
+      double lat1, double lng1, double lat2, double lng2) {
+    const r = 6371.0;
+    final dLat = (lat2 - lat1) * pi / 180;
+    final dLng = (lng2 - lng1) * pi / 180;
+    final a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(lat1 * pi / 180) *
+            cos(lat2 * pi / 180) *
+            sin(dLng / 2) *
+            sin(dLng / 2);
+    return 2 * r * asin(sqrt(a));
+  }
+
+  Future<void> _ringArrival(BuildContext context, Booking b) async {
+    if (_rung || b.arrivalNotified) return;
+    _rung = true;
+    await FirestoreService.setArrivalNotified(b.id);
+    try {
+      await _player.play(AssetSource('alarm.wav'));
+    } catch (_) {}
+    await NotificationService.showLocal(
+      title: '🎉 الفني وصل!',
+      body: '${b.technicianName} وصل لمكانك',
+    );
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('🎉 الفني وصل!'),
+        content: Text('${b.technicianName} وصل لمكانك الآن'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('تمام'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +89,11 @@ class BookingDetailsScreen extends StatelessWidget {
         backgroundColor:
             isTech ? const Color(0xFF1B5E20) : const Color(0xFF0D47A1),
       ),
-      body: StreamBuilder<DocumentSnapshot>(
+      body: ScreenBg(
+        child: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance
             .collection('bookings')
-            .doc(bookingId)
+            .doc(widget.bookingId)
             .snapshots(),
         builder: (c, snap) {
           if (!snap.hasData || !snap.data!.exists) {
@@ -68,6 +133,11 @@ class BookingDetailsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
+              // خريطة التتبع المباشر 🗺️ (للعميل)
+              if (!isTech &&
+                  (b.status == BookingStatus.accepted ||
+                      b.status == BookingStatus.inProgress))
+                _trackingCard(context, b, sc),
               _row('العميل', '🙋 ${b.clientName}'),
               _row('الفني', '🛠️ ${b.technicianName}'),
               _row('العنوان', '📍 ${b.address}'),
@@ -76,7 +146,16 @@ class BookingDetailsScreen extends StatelessWidget {
               if (b.notes.isNotEmpty) _row('ملاحظات', '📝 ${b.notes}'),
               if (b.rating != null)
                 _row('التقييم', '⭐ ${b.rating} ${b.review ?? ''}'),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
+              // أزرار اتصال بالطرف الآخر 📞💬
+              if (!isTech && b.technicianPhone.isNotEmpty)
+                CallButtons(
+                    phone: b.technicianPhone, color: sc),
+              if (isTech && b.clientPhone.isNotEmpty)
+                CallButtons(
+                    phone: b.clientPhone,
+                    color: const Color(0xFF1B5E20)),
+              const SizedBox(height: 8),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(backgroundColor: sc),
                 onPressed: () => Navigator.push(
@@ -127,6 +206,110 @@ class BookingDetailsScreen extends StatelessWidget {
             ],
           );
         },
+      ),
+      ),
+    );
+  }
+
+  /// بطاقة التتبع المباشر
+  Widget _trackingCard(BuildContext context, Booking b, Color sc) {
+    if (b.techLat == null || b.techLng == null) {
+      return const Card(
+        child: Padding(
+          padding: EdgeInsets.all(12),
+          child: Row(
+            children: [
+              SizedBox(
+                  width: 20,
+                  height: 20,
+                  child:
+                      CircularProgressIndicator(strokeWidth: 2)),
+              SizedBox(width: 10),
+              Expanded(
+                  child: Text(
+                      'بانتظار مشاركة الفني لموقعه المباشر...')),
+            ],
+          ),
+        ),
+      );
+    }
+    final km = _km(b.lat, b.lng, b.techLat!, b.techLng!);
+    if (km < 0.15) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _ringArrival(context, b);
+      });
+    }
+    final distTxt = km < 1
+        ? 'على بعد ${(km * 1000).toInt()} متر'
+        : 'على بعد ${km.toStringAsFixed(1)} كم';
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Text('🛵 ',
+                    style: TextStyle(fontSize: 22)),
+                Expanded(
+                  child: Text(
+                    km < 0.15
+                        ? 'الفني وصل 🎉'
+                        : 'الفني في الطريق... $distTxt',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 200,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: FlutterMap(
+                  options: MapOptions(
+                    initialCenter:
+                        LatLng(b.lat, b.lng),
+                    initialZoom: 14,
+                    interactionOptions:
+                        const InteractionOptions(
+                            flags: InteractiveFlag.all &
+                                ~InteractiveFlag.rotate),
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate:
+                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      userAgentPackageName:
+                          'com.example.fanni.fanni_app',
+                    ),
+                    MarkerLayer(
+                      markers: [
+                        Marker(
+                          point: LatLng(b.lat, b.lng),
+                          width: 50,
+                          height: 50,
+                          child: Icon(Icons.home,
+                              size: 40, color: sc),
+                        ),
+                        Marker(
+                          point: LatLng(
+                              b.techLat!, b.techLng!),
+                          width: 50,
+                          height: 50,
+                          child: const Text('🛵',
+                              style: TextStyle(fontSize: 34)),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

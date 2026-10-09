@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../models/service.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/call_buttons.dart';
+import '../../widgets/screen_bg.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -16,7 +18,8 @@ class ProfileScreen extends StatelessWidget {
           title: const Text('👤 حسابي'),
           backgroundColor:
               isTech ? const Color(0xFF1B5E20) : const Color(0xFF0D47A1)),
-      body: ListView(
+      body: ScreenBg(
+        child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           Card(
@@ -91,7 +94,10 @@ class ProfileScreen extends StatelessWidget {
             label: const Text('تسجيل الخروج',
                 style: TextStyle(color: Colors.red)),
           ),
+          const SizedBox(height: 12),
+          const DeveloperCard(),
         ],
+      ),
       ),
     );
   }

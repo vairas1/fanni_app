@@ -7,6 +7,7 @@ import '../../models/booking.dart';
 import '../../models/service.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/firestore_service.dart';
+import '../../widgets/screen_bg.dart';
 import '../common/booking_details_screen.dart';
 import '../common/chat_screen.dart';
 
@@ -33,7 +34,8 @@ class MyBookingsScreen extends StatelessWidget {
     final uid = context.watch<AuthProvider>().user?.uid ?? '';
     return Scaffold(
       appBar: AppBar(title: const Text('🧾 حجوزاتي')),
-      body: StreamBuilder<QuerySnapshot>(
+      body: ScreenBg(
+        child: StreamBuilder<QuerySnapshot>(
         stream: FirestoreService.clientBookings(uid),
         builder: (c, snap) {
           if (snap.hasError) {
@@ -161,6 +163,7 @@ class MyBookingsScreen extends StatelessWidget {
             },
           );
         },
+      ),
       ),
     );
   }

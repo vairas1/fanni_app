@@ -43,6 +43,14 @@ class Booking {
   final double? rating;
   final String? review;
   final DateTime createdAt;
+  // أرقام التواصل
+  final String technicianPhone;
+  final String clientPhone;
+  // موقع الفني المباشر (للتتبع)
+  final double? techLat;
+  final double? techLng;
+  final DateTime? techUpdatedAt;
+  final bool arrivalNotified;
 
   Booking({
     required this.id,
@@ -61,6 +69,12 @@ class Booking {
     this.rating,
     this.review,
     required this.createdAt,
+    this.technicianPhone = '',
+    this.clientPhone = '',
+    this.techLat,
+    this.techLng,
+    this.techUpdatedAt,
+    this.arrivalNotified = false,
   });
 
   factory Booking.fromDoc(DocumentSnapshot doc) {
@@ -68,6 +82,11 @@ class Booking {
     DateTime parseTs(dynamic v) {
       if (v is Timestamp) return v.toDate();
       return DateTime.now();
+    }
+
+    DateTime? parseTsNull(dynamic v) {
+      if (v is Timestamp) return v.toDate();
+      return null;
     }
 
     return Booking(
@@ -87,6 +106,12 @@ class Booking {
       rating: m['rating'] == null ? null : ((m['rating']) as num).toDouble(),
       review: m['review'] as String?,
       createdAt: parseTs(m['createdAt']),
+      technicianPhone: (m['technicianPhone'] ?? '') as String,
+      clientPhone: (m['clientPhone'] ?? '') as String,
+      techLat: m['techLat'] == null ? null : ((m['techLat']) as num).toDouble(),
+      techLng: m['techLng'] == null ? null : ((m['techLng']) as num).toDouble(),
+      techUpdatedAt: parseTsNull(m['techUpdatedAt']),
+      arrivalNotified: (m['arrivalNotified'] ?? false) as bool,
     );
   }
 
@@ -106,5 +131,7 @@ class Booking {
         'rating': rating,
         'review': review,
         'createdAt': Timestamp.fromDate(createdAt),
+        'technicianPhone': technicianPhone,
+        'clientPhone': clientPhone,
       };
 }

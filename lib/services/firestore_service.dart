@@ -52,6 +52,24 @@ class FirestoreService {
     return _db.collection('bookings').doc(bookingId).update({'status': status});
   }
 
+  /// تحديث موقع الفني المباشر (للتتبع)
+  static Future<void> updateTechLocation(
+      String bookingId, double lat, double lng) {
+    return _db.collection('bookings').doc(bookingId).update({
+      'techLat': lat,
+      'techLng': lng,
+      'techUpdatedAt': FieldValue.serverTimestamp(),
+    }).catchError((_) {});
+  }
+
+  /// تعليم أنه تم تنبيه العميل بالوصول
+  static Future<void> setArrivalNotified(String bookingId) {
+    return _db
+        .collection('bookings')
+        .doc(bookingId)
+        .update({'arrivalNotified': true}).catchError((_) {});
+  }
+
   /// حفظ التقييم وتحديث متوسط تقييم الفني بمعاملة واحدة
   static Future<void> submitRating({
     required String bookingId,

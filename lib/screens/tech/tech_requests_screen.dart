@@ -8,6 +8,8 @@ import '../../models/service.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/booking_provider.dart';
 import '../../services/firestore_service.dart';
+import '../../services/notification_service.dart';
+import '../../widgets/screen_bg.dart';
 import '../common/booking_details_screen.dart';
 import '../common/chat_screen.dart';
 
@@ -23,7 +25,8 @@ class TechRequestsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
           title: const Text('📥 طلبات الحجز'), backgroundColor: techGreen),
-      body: StreamBuilder<QuerySnapshot>(
+      body: ScreenBg(
+        child: StreamBuilder<QuerySnapshot>(
         stream: FirestoreService.techBookings(uid),
         builder: (c, snap) {
           if (snap.hasError) {
@@ -146,6 +149,7 @@ class TechRequestsScreen extends StatelessWidget {
             },
           );
         },
+      ),
       ),
     );
   }

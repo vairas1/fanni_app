@@ -9,6 +9,7 @@ import '../../models/service.dart';
 import '../../models/technician.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/booking_provider.dart';
+import '../../widgets/screen_bg.dart';
 import '../common/chat_screen.dart';
 
 /// شاشة الحجز: خريطة OpenStreet (بدون مفتاح) + اختيار موعد + تأكيد
@@ -29,6 +30,7 @@ class _BookingScreenState extends State<BookingScreen> {
   final _addressCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
   bool _locating = false;
+  bool _located = false;
 
   /// زرار إرسال الموقع الحالي 📍
   Future<void> _useMyLocation() async {
@@ -44,7 +46,10 @@ class _BookingScreenState extends State<BookingScreen> {
       }
       final p = await Geolocator.getCurrentPosition();
       if (!mounted) return;
-      setState(() => _pos = LatLng(p.latitude, p.longitude));
+      setState(() {
+        _pos = LatLng(p.latitude, p.longitude);
+        _located = true;
+      });
       _mapCtrl.move(_pos, 15);
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('تم تحديد موقعك الحالي 📍')));
@@ -73,9 +78,14 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   Future<void> _confirm() async {
+    if (!_located) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('حدد موقعك أولاً: دوس زرار إرسال موقعي الحالي 📍')));
+      return;
+    }
     if (_addressCtrl.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('من فضلك أدخل العنوان')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('اكتب العنوان بالتفصيل ✍️')));
       return;
     }
     final auth = context.read<AuthProvider>();
@@ -100,6 +110,8 @@ class _BookingScreenState extends State<BookingScreen> {
         address: _addressCtrl.text.trim(),
         dateTime: dateTime,
         notes: _notesCtrl.text.trim(),
+        technicianPhone: widget.technician.phone,
+        clientPhone: auth.phone,
       );
       if (!mounted || id == null) return;
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -124,7 +136,8 @@ class _BookingScreenState extends State<BookingScreen> {
         title: Text('حجز: ${widget.service.nameAr}'),
         backgroundColor: c,
       ),
-      body: ListView(
+      body: ScreenBg(
+        child: ListView(
         padding: const EdgeInsets.all(12),
         children: [
           Card(
@@ -140,21 +153,31 @@ class _BookingScreenState extends State<BookingScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          const Text('حدد موقعك على الخريطة (اضغط على أي مكان):',
+          const Text('اضغط على الخريطة أو ابعت موقعك الحالي:',
               style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           SizedBox(
             width: double.infinity,
-            child: OutlinedButton.icon(
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: c,
+                padding: const EdgeInsets.all(14),
+              ),
               onPressed: _locating ? null : _useMyLocation,
               icon: _locating
                   ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child:
-                          CircularProgressIndicator(strokeWidth: 2))
-                  : const Icon(Icons.my_location),
-              label: const Text('📍 إرسال موقعي الحالي'),
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white))
+                  : const Icon(Icons.send_to_mobile,
+                      color: Colors.white),
+              label: Text(
+                  _located
+                      ? 'تم إرسال الموقع ✅ (اضغط لتحديثه)',
+                      '📍 إرسال موقعي الحالي للفني',
+                  style: const TextStyle(
+                      fontSize: 16, color: Colors.white)),
             ),
           ),
           const SizedBox(height: 4),
@@ -167,7 +190,12 @@ class _BookingScreenState extends State<BookingScreen> {
                 options: MapOptions(
                   initialCenter: _pos,
                   initialZoom: 14,
-                  onTap: (tap, p) => setState(() => _pos = p),
+                  onTap: (tap, p) {
+                    setState(() {
+                      _pos = p;
+                      _located = true;
+                    });
+                  },
                 ),
                 children: [
                   TileLayer(
@@ -198,10 +226,12 @@ class _BookingScreenState extends State<BookingScreen> {
           const SizedBox(height: 8),
           TextField(
             controller: _addressCtrl,
+            maxLines: 2,
             decoration: const InputDecoration(
-              labelText: 'العنوان بالتفصيل *',
+              labelText: 'اكتب هنا العنوان بالتفصيل *',
+              hintText: 'مثال: شارع 15، عمارة 7، الدور الثالث، شقة 12',
               border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.location_on),
+              prefixIcon: Icon(Icons.edit_location_alt),
             ),
           ),
           const SizedBox(height: 12),
@@ -252,6 +282,7 @@ class _BookingScreenState extends State<BookingScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }
