@@ -212,7 +212,8 @@ class _BookingScreenState extends State<BookingScreen> {
                         style: TextStyle(fontSize: 18)),
               ),
             ),
-          ],
+          ),
+        ],
       ),
     );
   }
