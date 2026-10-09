@@ -61,6 +61,7 @@ class PlacesScreen extends StatelessWidget {
       );
         },
       ),
+      ),
     );
   }
 
@@ -167,9 +168,5 @@ class PlacesScreen extends StatelessWidget {
               );
             },
           );
-        },
-      ),
-      ),
-    );
   }
 }
