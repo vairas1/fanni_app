@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +8,6 @@ import '../../models/service.dart';
 import '../../models/technician.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/booking_provider.dart';
-import '../../widgets/screen_bg.dart';
 import '../common/chat_screen.dart';
 
 /// شاشة الحجز: خريطة OpenStreet (بدون مفتاح) + اختيار موعد + تأكيد
@@ -29,38 +27,6 @@ class _BookingScreenState extends State<BookingScreen> {
   TimeOfDay _time = const TimeOfDay(hour: 10, minute: 0);
   final _addressCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
-  bool _locating = false;
-  bool _located = false;
-
-  /// زرار إرسال الموقع الحالي 📍
-  Future<void> _useMyLocation() async {
-    setState(() => _locating = true);
-    try {
-      var perm = await Geolocator.checkPermission();
-      if (perm == LocationPermission.denied) {
-        perm = await Geolocator.requestPermission();
-      }
-      if (perm == LocationPermission.denied ||
-          perm == LocationPermission.deniedForever) {
-        throw 'يرجى السماح بالوصول للموقع من إعدادات الموبايل';
-      }
-      final p = await Geolocator.getCurrentPosition();
-      if (!mounted) return;
-      setState(() {
-        _pos = LatLng(p.latitude, p.longitude);
-        _located = true;
-      });
-      _mapCtrl.move(_pos, 15);
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم تحديد موقعك الحالي 📍')));
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('$e')));
-    } finally {
-      if (mounted) setState(() => _locating = false);
-    }
-  }
 
   Future<void> _pickDate() async {
     final d = await showDatePicker(
@@ -78,11 +44,6 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   Future<void> _confirm() async {
-    if (!_located) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('حدد موقعك أولاً: دوس زرار إرسال موقعي الحالي 📍')));
-      return;
-    }
     if (_addressCtrl.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('اكتب العنوان بالتفصيل ✍️')));
@@ -136,8 +97,7 @@ class _BookingScreenState extends State<BookingScreen> {
         title: Text('حجز: ${widget.service.nameAr}'),
         backgroundColor: c,
       ),
-      body: ScreenBg(
-        child: ListView(
+      body: ListView(
         padding: const EdgeInsets.all(12),
         children: [
           Card(
@@ -153,34 +113,9 @@ class _BookingScreenState extends State<BookingScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          const Text('اضغط على الخريطة أو ابعت موقعك الحالي:',
+          const Text('اضغط على الخريطة لتحديد موقعك:',
               style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: c,
-                padding: const EdgeInsets.all(14),
-              ),
-              onPressed: _locating ? null : _useMyLocation,
-              icon: _locating
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white))
-                  : const Icon(Icons.send_to_mobile,
-                      color: Colors.white),
-              label: Text(
-                  _located
-                      ? 'تم إرسال الموقع ✅ (اضغط لتحديثه)'
-                      : '📍 إرسال موقعي الحالي للفني',
-                  style: const TextStyle(
-                      fontSize: 16, color: Colors.white)),
-            ),
-          ),
-          const SizedBox(height: 4),
           SizedBox(
             height: 260,
             child: ClipRRect(
@@ -191,10 +126,7 @@ class _BookingScreenState extends State<BookingScreen> {
                   initialCenter: _pos,
                   initialZoom: 14,
                   onTap: (tap, p) {
-                    setState(() {
-                      _pos = p;
-                      _located = true;
-                    });
+                    setState(() => _pos = p);
                   },
                 ),
                 children: [
@@ -280,9 +212,7 @@ class _BookingScreenState extends State<BookingScreen> {
                         style: TextStyle(fontSize: 18)),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
       ),
     );
   }

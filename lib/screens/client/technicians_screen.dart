@@ -63,66 +63,81 @@ class TechniciansScreen extends StatelessWidget {
                     return Card(
                       child: Padding(
                         padding: const EdgeInsets.all(8),
-                        child: Row(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            CircleAvatar(
-                              radius: 26,
-                              backgroundColor: service.color,
-                              child: Text(
-                                t.name.isEmpty ? 'ف' : t.name[0],
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                children: [
-                                  Text(t.name,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16)),
-                                  RatingStars(
-                                      value: t.ratingAvg,
-                                      count: t.ratingCount),
-                                  if (t.phone.isNotEmpty)
-                                    Text('📞 ${t.phone}',
-                                        style: const TextStyle(
-                                            color: Colors.grey)),
-                                ],
-                              ),
-                            ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: service.color),
-                              onPressed: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => BookingScreen(
-                                      service: service, technician: t),
+                            Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 26,
+                                  backgroundColor: service.color,
+                                  child: Text(
+                                    t.name.isEmpty ? 'ف' : t.name[0],
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                 ),
-                              ),
-                              child: const Text('احجز'),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(t.name,
+                                          style: const TextStyle(
+                                              fontWeight:
+                                                  FontWeight.bold,
+                                              fontSize: 16)),
+                                      RatingStars(
+                                          value: t.ratingAvg,
+                                          count: t.ratingCount),
+                                      if (t.phone.isNotEmpty)
+                                        Text('📞 ${t.phone}',
+                                            style: const TextStyle(
+                                                color: Colors.grey)),
+                                    ],
+                                  ),
+                                ),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          service.color),
+                                  onPressed: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => BookingScreen(
+                                          service: service,
+                                          technician: t),
+                                    ),
+                                  ),
+                                  child: const Text('احجز'),
+                                ),
+                              ],
                             ),
                             if (t.phone.isNotEmpty)
                               Row(
-                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                mainAxisSize: MainAxisSize.max,
                                 children: [
-                                  IconButton(
-                                    tooltip: 'اتصال 📞',
+                                  TextButton.icon(
                                     icon: Icon(Icons.call,
+                                        size: 18,
                                         color: service.color),
+                                    label: Text('اتصال',
+                                        style: TextStyle(
+                                            color: service.color)),
                                     onPressed: () => CallButtons
                                         .callPhone(context, t.phone),
                                   ),
-                                  IconButton(
-                                    tooltip: 'واتساب 💬',
+                                  TextButton.icon(
                                     icon: const Text('💬',
-                                        style:
-                                            TextStyle(fontSize: 20)),
+                                        style: TextStyle(
+                                            fontSize: 16)),
+                                    label: const Text('واتساب',
+                                        style: TextStyle(
+                                            color: Color(
+                                                0xFF25D366))),
                                     onPressed: () => CallButtons
                                         .whatsapp(
                                             context, t.phone),

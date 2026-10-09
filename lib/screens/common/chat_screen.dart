@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/chat_message.dart';
@@ -185,6 +186,13 @@ class _ChatScreenState extends State<ChatScreen> {
                         () => _showEmoji = !_showEmoji),
                   ),
                   IconButton(
+                    icon: Icon(Icons.location_on, color: sc),
+                    tooltip: 'إرسال موقعي 📍',
+                    onPressed: chat.sending
+                        ? null
+                        : () => _sendLocation(context, uid),
+                  ),
+                  IconButton(
                     icon: Icon(Icons.image, color: sc),
                     tooltip: 'إرفاق صورة 📷',
                     onPressed: chat.sending
@@ -245,5 +253,38 @@ class _ChatScreenState extends State<ChatScreen> {
           text: _ctrl.text,
         );
     _ctrl.clear();
+  }
+
+  /// إرسال الموقع الحالي في الشات 📍 (للعميل والفني)
+  Future<void> _sendLocation(BuildContext context, String uid) async {
+    if (uid.isEmpty) return;
+    try {
+      var perm = await Geolocator.checkPermission();
+      if (perm == LocationPermission.denied) {
+        perm = await Geolocator.requestPermission();
+      }
+      if (perm == LocationPermission.denied ||
+          perm == LocationPermission.deniedForever) {
+        throw 'يرجى السماح بالوصول للموقع من إعدادات الموبايل';
+      }
+      final p = await Geolocator.getCurrentPosition();
+      final link =
+          'https://www.openstreetmap.org/?mlat=${p.latitude}&mlon=${p.longitude}#map=16/${p.latitude}/${p.longitude}';
+      await context.read<ChatProvider>().sendText(
+            bookingId: widget.bookingId,
+            senderId: uid,
+            text:
+                '📍 موقعي الحالي:\n${p.latitude.toStringAsFixed(5)} ، ${p.longitude.toStringAsFixed(5)}\n$link',
+          );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('تم إرسال موقعك 📍')));
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('$e')));
+      }
+    }
   }
 }

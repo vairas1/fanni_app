@@ -74,41 +74,43 @@ class PlacesScreen extends StatelessWidget {
               return Card(
                 child: Padding(
                   padding: const EdgeInsets.all(10),
-                  child: Row(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      CircleAvatar(
-                        radius: 26,
-                        backgroundColor: color,
-                        child: Text(p.emoji,
-                            style: const TextStyle(fontSize: 24)),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(p.name,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16)),
-                            if (p.address.isNotEmpty)
-                              Text('📍 ${p.address}',
-                                  style: const TextStyle(
-                                      color: Colors.grey)),
-                            if (p.phone.isNotEmpty)
-                              Text('📞 ${p.phone}',
-                                  style: const TextStyle(
-                                      color: Colors.grey)),
-                            if (p.ratingCount > 0)
-                              RatingStars(
-                                  value: p.ratingAvg,
-                                  count: p.ratingCount),
-                          ],
-                        ),
-                      ),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
+                      Row(
                         children: [
+                          CircleAvatar(
+                            radius: 26,
+                            backgroundColor: color,
+                            child: Text(p.emoji,
+                                style:
+                                    const TextStyle(fontSize: 24)),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                              children: [
+                                Text(p.name,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16)),
+                                if (p.address.isNotEmpty)
+                                  Text('📍 ${p.address}',
+                                      style: const TextStyle(
+                                          color: Colors.grey)),
+                                if (p.phone.isNotEmpty)
+                                  Text('📞 ${p.phone}',
+                                      style: const TextStyle(
+                                          color: Colors.grey)),
+                                if (p.ratingCount > 0)
+                                  RatingStars(
+                                      value: p.ratingAvg,
+                                      count: p.ratingCount),
+                              ],
+                            ),
+                          ),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: color),
@@ -131,37 +133,43 @@ class PlacesScreen extends StatelessWidget {
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => BookingScreen(
-                                      service: svc, technician: tech),
+                                      service: svc,
+                                      technician: tech),
                                 ),
                               );
                             },
                             child: const Text('اطلب'),
                           ),
-                          if (p.phone.isNotEmpty)
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  tooltip: 'اتصال 📞',
-                                  icon: Icon(Icons.call,
-                                      color: color),
-                                  onPressed: () =>
-                                      CallButtons.callPhone(
-                                          context, p.phone),
-                                ),
-                                IconButton(
-                                  tooltip: 'واتساب 💬',
-                                  icon: const Text('💬',
-                                      style: TextStyle(
-                                          fontSize: 20)),
-                                  onPressed: () =>
-                                      CallButtons.whatsapp(
-                                          context, p.phone),
-                                ),
-                              ],
-                            ),
                         ],
                       ),
+                      if (p.phone.isNotEmpty)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton.icon(
+                              icon: Icon(Icons.call,
+                                  size: 18, color: color),
+                              label: Text('اتصال',
+                                  style:
+                                      TextStyle(color: color)),
+                              onPressed: () =>
+                                  CallButtons.callPhone(
+                                      context, p.phone),
+                            ),
+                            TextButton.icon(
+                              icon: const Text('💬',
+                                  style:
+                                      TextStyle(fontSize: 16)),
+                              label: const Text('واتساب',
+                                  style: TextStyle(
+                                      color:
+                                          Color(0xFF25D366))),
+                              onPressed: () =>
+                                  CallButtons.whatsapp(
+                                      context, p.phone),
+                            ),
+                          ],
+                        ),
                     ],
                   ),
                 ),
