@@ -76,7 +76,21 @@ jobs:
           sed -i '' -E 's/IPHONEOS_DEPLOYMENT_TARGET = 1[0-9]\.[0-9]/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' ios/Runner.xcodeproj/project.pbxproj || true
       - run: flutter pub get
       - name: Update CocoaPods specs (latest Firebase)
-        run: cd ios && pod repo update
+        run: |
+          cd ios && pod repo update
+          cat >> Podfile <<'EOF'
+
+          # إجبار Swift 5 على حزمة Firebase المتأثرة بكلمة sending
+          post_install do |installer|
+            installer.pods_project.targets.each do |target|
+              if target.name == 'FirebaseSharedSwift'
+                target.build_configurations.each do |config|
+                  config.build_settings['SWIFT_VERSION'] = '5.0'
+                end
+              end
+            end
+          end
+          EOF
       - name: App icon iOS
         run: dart run flutter_launcher_icons -f flutter_launcher_icons_ios.yaml
       - run: flutter build ios --no-codesign
