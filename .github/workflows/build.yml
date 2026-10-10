@@ -67,6 +67,7 @@ jobs:
           mkdir -p /tmp/keep && cp -r lib /tmp/keep/lib && cp pubspec.yaml /tmp/keep/pubspec.yaml
           if [ -f ios/Runner/GoogleService-Info.plist ]; then cp ios/Runner/GoogleService-Info.plist /tmp/keep/plist; fi
           rm -rf ios
+          mkdir -p build/ios/SourcePackages
           flutter create --platforms=ios --project-name fanni_app --org com.example.fanni .
           rm -rf lib && cp -r /tmp/keep/lib lib && cp /tmp/keep/pubspec.yaml pubspec.yaml
           if [ -f /tmp/keep/plist ]; then cp /tmp/keep/plist ios/Runner/GoogleService-Info.plist; fi
