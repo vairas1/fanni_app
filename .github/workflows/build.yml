@@ -78,19 +78,9 @@ jobs:
       - name: Update CocoaPods specs (latest Firebase)
         run: |
           cd ios && pod repo update
-          cat >> Podfile <<'EOF'
-
-          # إجبار Swift 5 على حزمة Firebase المتأثرة بكلمة sending
-          post_install do |installer|
-            installer.pods_project.targets.each do |target|
-              if target.name == 'FirebaseSharedSwift'
-                target.build_configurations.each do |config|
-                  config.build_settings['SWIFT_VERSION'] = '5.0'
-                end
-              end
-            end
-          end
-          EOF
+          # دمج إعداد Swift 5 داخل post_install الموجود (لا يسمح بتكراره)
+          sed -i '' 's|    flutter_additional_ios_build_settings(target)|    flutter_additional_ios_build_settings(target)\n    if target.name == '"'"'FirebaseSharedSwift'"'"'\n      target.build_configurations.each do \|config\|\n        config.build_settings['"'"'SWIFT_VERSION'"'"'] = '"'"'5.0'"'"'\n      end\n    end|' Podfile
+          grep -q "FirebaseSharedSwift" Podfile
       - name: App icon iOS
         run: dart run flutter_launcher_icons -f flutter_launcher_icons_ios.yaml
       - run: flutter build ios --no-codesign
