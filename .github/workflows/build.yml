@@ -37,6 +37,9 @@ jobs:
           # صلاحيات الموقع لزرار الموقع الحالي
           sed -i 's|<application|    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>\n    <application|' android/app/src/main/AndroidManifest.xml
           grep -q "ACCESS_FINE_LOCATION" android/app/src/main/AndroidManifest.xml
+          # السماح باكتشاف تطبيقات الخرائط (زرار افتح في الخرائط)
+          sed -i 's|    <application|    <queries>\n        <intent>\n            <action android:name="android.intent.action.VIEW" />\n            <data android:scheme="geo" />\n        </intent>\n    </queries>\n    <application|' android/app/src/main/AndroidManifest.xml
+          grep -q "<queries>" android/app/src/main/AndroidManifest.xml
       - run: flutter pub get
       - name: App icon + name
         run: |

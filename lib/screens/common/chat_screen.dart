@@ -323,25 +323,21 @@ class _MessageTextState extends State<_MessageText> {
   }
 
   Future<void> _openMap(double lat, double lng) async {
-    try {
-      if (defaultTargetPlatform == TargetPlatform.android) {
-        final geo = Uri.parse('geo:$lat,$lng?q=$lat,$lng');
-        if (await canLaunchUrl(geo)) {
-          await launchUrl(geo);
-          return;
-        }
-      } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-        final apple =
-            Uri.parse('https://maps.apple.com/?ll=$lat,$lng&q=$lat,$lng');
-        if (await canLaunchUrl(apple)) {
-          await launchUrl(apple,
-              mode: LaunchMode.externalApplication);
-          return;
-        }
-      }
-      await _open(
-          'https://www.openstreetmap.org/?mlat=$lat&mlon=$lng#map=16/$lat/$lng');
-    } catch (_) {}
+    final geo = Uri.parse('geo:$lat,$lng?q=$lat,$lng');
+    final gmaps = Uri.parse(
+        'https://www.google.com/maps/search/?api=1&query=$lat,$lng');
+    final osm = Uri.parse(
+        'https://www.openstreetmap.org/?mlat=$lat&mlon=$lng#map=16/$lat/$lng');
+    for (final uri in [geo, gmaps, osm]) {
+      try {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        return;
+      } catch (_) {}
+    }
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('تعذر فتح الخرائط — ثبت تطبيق خرائط')));
+    }
   }
 
   @override
