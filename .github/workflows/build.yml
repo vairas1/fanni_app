@@ -45,11 +45,11 @@ jobs:
         run: |
           dart run flutter_launcher_icons -f flutter_launcher_icons_android.yaml
           sed -i 's/android:label="[^"]*"/android:label="فنيّات"/' android/app/src/main/AndroidManifest.xml
-      - run: flutter build apk --debug
+      - run: flutter build apk --release
       - uses: actions/upload-artifact@v4
         with:
-          name: app-debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          name: app-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
 
   # مهمة iOS متوقفة مؤقتاً — التركيز على APK الآن
   # ios:
