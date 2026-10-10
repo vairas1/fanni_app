@@ -67,10 +67,10 @@ jobs:
           flutter create --platforms=ios --project-name fanni_app --org com.example.fanni .
           rm -rf lib && cp -r /tmp/keep/lib lib && cp /tmp/keep/pubspec.yaml pubspec.yaml
           if [ -f /tmp/keep/plist ]; then cp /tmp/keep/plist ios/Runner/GoogleService-Info.plist; fi
-          # cloud_firestore يتطلب iOS 15+
-          sed -i -E "s/#? *platform :ios.*$/platform :ios, '15.0'/" ios/Podfile
+          # cloud_firestore يتطلب iOS 15+ (ملاحظة: sed على macOS يحتاج -i '')
+          sed -i '' -E "s/#? *platform :ios.*$/platform :ios, '15.0'/" ios/Podfile
           grep -q "platform :ios, '15.0'" ios/Podfile || (head -8 ios/Podfile; exit 1)
-          sed -i -E 's/IPHONEOS_DEPLOYMENT_TARGET = 1[0-9]\.[0-9]/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' ios/Runner.xcodeproj/project.pbxproj || true
+          sed -i '' -E 's/IPHONEOS_DEPLOYMENT_TARGET = 1[0-9]\.[0-9]/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' ios/Runner.xcodeproj/project.pbxproj || true
       - run: flutter pub get
       - name: App icon iOS
         run: dart run flutter_launcher_icons -f flutter_launcher_icons_ios.yaml
