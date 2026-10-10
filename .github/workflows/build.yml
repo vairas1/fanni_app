@@ -83,6 +83,12 @@ jobs:
           grep -q "FirebaseSharedSwift" Podfile
       - name: App icon iOS
         run: dart run flutter_launcher_icons -f flutter_launcher_icons_ios.yaml
+      - name: Select newest Xcode
+        run: |
+          ls -d /Applications/Xcode*.app
+          xcodebuild -version
+          sudo xcode-select -s $(ls -d /Applications/Xcode*.app | sort -V | tail -1)
+          xcodebuild -version
       - run: flutter build ios --no-codesign
       - uses: actions/upload-artifact@v4
         with:
