@@ -51,32 +51,31 @@ jobs:
           name: app-release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
 
-  # مهمة iOS متوقفة مؤقتاً — التركيز على APK الآن
-  # ios:
-  #   runs-on: macos-14
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: subosito/flutter-action@v2
-  #       with:
-  #         flutter-version: '3.24.3'
-  #         channel: stable
-  #     - name: Generate iOS platform
-  #       run: |
-  #         mkdir -p /tmp/keep && cp -r lib /tmp/keep/lib && cp pubspec.yaml /tmp/keep/pubspec.yaml
-  #         if [ -f ios/Runner/GoogleService-Info.plist ]; then cp ios/Runner/GoogleService-Info.plist /tmp/keep/plist; fi
-  #         rm -rf ios
-  #         flutter create --platforms=ios --project-name fanni_app --org com.example.fanni .
-  #         rm -rf lib && cp -r /tmp/keep/lib lib && cp /tmp/keep/pubspec.yaml pubspec.yaml
-  #         if [ -f /tmp/keep/plist ]; then cp /tmp/keep/plist ios/Runner/GoogleService-Info.plist; fi
-  #         # cloud_firestore يتطلب iOS 15+
-  #         sed -i -E "s/#? *platform :ios.*$/platform :ios, '15.0'/" ios/Podfile
-  #         grep -q "platform :ios, '15.0'" ios/Podfile
-  #         sed -i 's/IPHONEOS_DEPLOYMENT_TARGET = 12.0/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' ios/Runner.xcodeproj/project.pbxproj || true
-  #     - run: flutter pub get
-  #     - name: App icon
-  #       run: dart run flutter_launcher_icons
-  #     - run: flutter build ios --no-codesign
-  #     - uses: actions/upload-artifact@v4
-  #       with:
-  #         name: ios-no-codesign
-  #         path: build/ios/iphoneos
+  ios:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.8'
+          channel: stable
+      - name: Generate iOS platform
+        run: |
+          mkdir -p /tmp/keep && cp -r lib /tmp/keep/lib && cp pubspec.yaml /tmp/keep/pubspec.yaml
+          if [ -f ios/Runner/GoogleService-Info.plist ]; then cp ios/Runner/GoogleService-Info.plist /tmp/keep/plist; fi
+          rm -rf ios
+          flutter create --platforms=ios --project-name fanni_app --org com.example.fanni .
+          rm -rf lib && cp -r /tmp/keep/lib lib && cp /tmp/keep/pubspec.yaml pubspec.yaml
+          if [ -f /tmp/keep/plist ]; then cp /tmp/keep/plist ios/Runner/GoogleService-Info.plist; fi
+          # cloud_firestore يتطلب iOS 15+
+          sed -i -E "s/#? *platform :ios.*$/platform :ios, '15.0'/" ios/Podfile
+          grep -q "platform :ios, '15.0'" ios/Podfile || (head -8 ios/Podfile; exit 1)
+          sed -i -E 's/IPHONEOS_DEPLOYMENT_TARGET = 1[0-9]\.[0-9]/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' ios/Runner.xcodeproj/project.pbxproj || true
+      - run: flutter pub get
+      - name: App icon iOS
+        run: dart run flutter_launcher_icons -f flutter_launcher_icons_ios.yaml
+      - run: flutter build ios --no-codesign
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-no-codesign
+          path: build/ios/iphoneos

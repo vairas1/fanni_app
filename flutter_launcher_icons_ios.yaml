@@ -1,0 +1,5 @@
+# إعدادات أيقونة iOS فقط (مهمة iOS)
+flutter_launcher_icons:
+  android: false
+  ios: true
+  image_path: "assets/icon.png"
