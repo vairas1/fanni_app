@@ -1,9 +1,12 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/chat_message.dart';
 import '../../models/service.dart';
@@ -123,11 +126,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                                                 .white)))),
                               ),
                             if (m.text.isNotEmpty)
-                              Text(m.text,
-                                  style: TextStyle(
-                                      color: mine
-                                          ? Colors.white
-                                          : Colors.black87)),
+                              _MessageText(
+                                  text: m.text, mine: mine),
                           ],
                         ),
                       ),
@@ -286,5 +286,129 @@ class _ChatScreenState extends State<ChatScreen> {
             .showSnackBar(SnackBar(content: Text('$e')));
       }
     }
+  }
+}
+
+/// نص رسالة تفاعلي: روابط قابلة للضغط + زرار فتح الخريطة لرسائل الموقع
+class _MessageText extends StatefulWidget {
+  final String text;
+  final bool mine;
+  const _MessageText({required this.text, required this.mine});
+
+  @override
+  State<_MessageText> createState() => _MessageTextState();
+}
+
+class _MessageTextState extends State<_MessageText> {
+  final List<TapGestureRecognizer> _regs = [];
+
+  @override
+  void dispose() {
+    for (final r in _regs) {
+      r.dispose();
+    }
+    super.dispose();
+  }
+
+  static final _urlRe = RegExp(r'https?://\S+');
+  static final _locRe = RegExp(r'(\d+\.\d+)\s*،\s*(\d+\.\d+)');
+
+  Future<void> _open(String url) async {
+    final uri = Uri.parse(url);
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _openMap(double lat, double lng) async {
+    try {
+      if (defaultTargetPlatform == TargetPlatform.android) {
+        final geo = Uri.parse('geo:$lat,$lng?q=$lat,$lng');
+        if (await canLaunchUrl(geo)) {
+          await launchUrl(geo);
+          return;
+        }
+      } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+        final apple =
+            Uri.parse('https://maps.apple.com/?ll=$lat,$lng&q=$lat,$lng');
+        if (await canLaunchUrl(apple)) {
+          await launchUrl(apple,
+              mode: LaunchMode.externalApplication);
+          return;
+        }
+      }
+      await _open(
+          'https://www.openstreetmap.org/?mlat=$lat&mlon=$lng#map=16/$lat/$lng');
+    } catch (_) {}
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final textColor = widget.mine ? Colors.white : Colors.black87;
+    final linkColor =
+        widget.mine ? Colors.yellow[200]! : const Color(0xFF0D47A1);
+    final spans = <TextSpan>[];
+    final text = widget.text;
+    var last = 0;
+    for (final m in _urlRe.allMatches(text)) {
+      if (m.start > last) {
+        spans.add(TextSpan(text: text.substring(last, m.start)));
+      }
+      final url = m.group(0)!;
+      final reg = TapGestureRecognizer()..onTap = () => _open(url);
+      _regs.add(reg);
+      spans.add(TextSpan(
+        text: 'رابط الخريطة',
+        style: TextStyle(
+            color: linkColor,
+            decoration: TextDecoration.underline,
+            fontWeight: FontWeight.bold),
+        recognizer: reg,
+      ));
+      last = m.end;
+    }
+    if (last < text.length) {
+      spans.add(TextSpan(text: text.substring(last)));
+    }
+
+    final loc = _locRe.firstMatch(text);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        RichText(
+          text: TextSpan(
+              style: TextStyle(color: textColor, fontSize: 15),
+              children:
+                  spans.isEmpty ? [TextSpan(text: text)] : spans),
+        ),
+        if (loc != null) ...[
+          const SizedBox(height: 6),
+          InkWell(
+            onTap: () => _openMap(double.parse(loc.group(1)!),
+                double.parse(loc.group(2)!)),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: widget.mine
+                    ? Colors.white.withOpacity(0.25)
+                    : const Color(0xFF0D47A1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Text(
+                'افتح في تطبيق الخرائط',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13),
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
   }
 }
